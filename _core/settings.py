@@ -48,11 +48,15 @@ ALLOWED_HOSTS = [
     'v226.3kok.app',
     '3k-v226.up.railway.app',
     'healthcheck.railway.app',
+    '127.0.0.1',
+    'localhost'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://v226.3kok.app',
     'https://3k-v226.up.railway.app',
+    'https://127.0.0.1',
+    'https://localhost'
 ]
 # CSRF trusted origins
 # CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
