@@ -4,7 +4,7 @@
     "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
   },
   "deploy": {
-    "startCommand": "daphne -b 0.0.0.0 -p $PORT _core.asgi:application",
+    "startCommand": "daphne -b 0.0.0.0 -p 8080 _core.asgi:application",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE"
   }
