@@ -12,7 +12,7 @@
             </svg>
         </div>
         <span {% if page == 'Home' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-            For You
+            หน้าหลัก
         </span>
     </button>
     <button id="explore" 
@@ -28,7 +28,7 @@
             </svg>
         </div>
         <span {% if page == 'Explore' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-            Explore
+            สืบค้น
         </span>
     </button>
     <button id="following" class="button-nav dark:hover:!bg-neutral-800"
@@ -42,7 +42,7 @@
                 </svg>
             </div>
             <span {% if page == 'Following' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-                Following
+                ที่ท่านติดตาม
             </span>
     </button>
     <button id="friends" class="button-nav dark:hover:!bg-neutral-800"
@@ -58,7 +58,7 @@
                 </svg>
             </div>
             <span {% if page == 'Friends' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-                Friends
+                เพื่อน
             </span>
     </button>
     <button id="upload" 
@@ -74,7 +74,7 @@
             </svg>
         </div>
         <span {% if page == 'Upload' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-            Upload
+            อัพโหลด
         </span>
     </button>
     <div class="relative">
@@ -95,7 +95,7 @@
                 </svg>
             </div>
             <span :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-                Activity
+                กิจกรรม
             </span>
         </button>
     </div>
@@ -112,7 +112,7 @@
                 </svg>
             </div>
             <span {% if page == 'Messages' %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-                Messages
+                รับส่งข้อความ
             </span>
         </button>
     </div>
@@ -128,7 +128,7 @@
             </div>
         </div>
         <span {% if page == 'Profile' and user == profile_user %}class="text-rose-500"{% endif %} :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-            Profile
+            โพรไฟล์
         </span>
     </button>
     <button id="more" @click="showDrawer = !showDrawer; showMore = true" class="button-nav dark:hover:!bg-neutral-800">
@@ -138,7 +138,7 @@
             </svg>
         </div>
         <span :class="{ '!opacity-0 pointer-events-none' : showDrawer }">
-            More
+            อื่นๆ
         </span>
     </button>
 </div>

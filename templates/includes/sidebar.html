@@ -64,7 +64,7 @@
                     </svg>
                 </div>
             </button>
-            <h2 class="pl-3 mb-7">Notifications</h2>
+            <h2 class="pl-3 mb-7">การแจ้งเตือน</h2>
             <div id="notification-content" class="flex-1 overflow-y-auto overscroll-contain hide-scrollbar"></div>
         </div>
         <div x-show="showMessages" class="relative px-2 py-5 h-screen flex flex-col">
@@ -75,7 +75,7 @@
                     </svg>
                 </div>
             </button>
-            <h2 class="pl-3 mb-7">Messages</h2>
+            <h2 class="pl-3 mb-7">คู่สนทนา</h2>
             <div id="messages-content" class="flex-1 overflow-y-auto overscroll-contain hide-scrollbar"></div>
         </div>
         <div x-show="showMore" class="relative px-2 py-5">
@@ -86,11 +86,11 @@
                     </svg>
                 </div>
             </button>
-            <h2 class="pl-3 mb-7">More</h2>
+            <h2 class="pl-3 mb-7">อื่นๆ</h2>
             <ul class="flex flex-col gap-1">
                 <li>
                     <button @click="resetAll(); showColorModes = true" class="button-rounded dark:hover:!bg-neutral-800">
-                        <span class="font-medium">Dark mode</span>
+                        <span class="font-medium">โหมดกลางคืน</span>
                         <div class="size-4 fill-neutral-400">
                             <svg viewBox="0 0 48 48">
                                 <path d="M28.74 24 15.08 10.33a1 1 0 0 1 0-1.41l1.84-1.84a1 1 0 0 1 1.41 0L34.54 23.3a1 1 0 0 1 0 1.42l-16.2 16.21a1 1 0 0 1-1.42 0l-1.84-1.84a1 1 0 0 1 0-1.41L28.74 24Z"></path>
@@ -100,14 +100,14 @@
                 </li>
                 <li>
                     <a href="{% url 'settings' %}" class="button-rounded dark:hover:!bg-neutral-800">
-                        <span class="font-medium">Settings</span>
+                        <span class="font-medium">ตั้งค่า</span>
                     </a>
                 </li>
                 <li>
                     <form method="post" action="{% url 'account_logout' %}" >
                         {% csrf_token %}
                         <button type="submit" class="button-rounded dark:hover:!bg-neutral-800">
-                            <span class="font-medium">Log out</span>
+                            <span class="font-medium">ล็อกเอ้าท์</span>
                         </button>
                     </form>
                 </li>
