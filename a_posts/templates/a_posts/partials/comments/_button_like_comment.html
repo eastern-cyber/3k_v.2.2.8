@@ -2,13 +2,13 @@
         hx-swap="outerHTML"
         class="px-2">
         {% if user in comment.likes.all %}
-            <div class="size-5 fill-rose-500">
-                <svg viewBox="0 0 24 24">
-                    <path d="M7.5 2.25C10.5 2.25 12 4.25 12 4.25C12 4.25 13.5 2.25 16.5 2.25C20 2.25 22.5 4.99999 22.5 8.5C22.5 12.5 19.2311 16.0657 16.25 18.75C14.4095 20.4072 13 21.5 12 21.5C11 21.5 9.55051 20.3989 7.75 18.75C4.81949 16.0662 1.5 12.5 1.5 8.5C1.5 4.99999 4 2.25 7.5 2.25Z"></path>
+            <div class="size-10 fill-rose-500">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2.5L14.5 8.5L21 9.2L16 14L17.5 20.5L12 17L6.5 20.5L8 14L3 9.2L9.5 8.5L12 2.5Z"/>
                 </svg>
             </div>
         {% else %}
-            <div class="size-10 fill-neutral-500">
+            <div class="size-5 fill-neutral-500">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2.5L14.5 8.5L21 9.2L16 14L17.5 20.5L12 17L6.5 20.5L8 14L3 9.2L9.5 8.5L12 2.5Z"/>
                 </svg>
