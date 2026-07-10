@@ -1,4 +1,4 @@
-# KokKokKok 3k_v.2.2.6
+# KokKokKok 3k_v.2.2.7
 
 ## Requirements
 Python: https://www.python.org/ 
@@ -43,4 +43,4 @@ python manage.py createsuperuser
 python manage.py runserver
 http://localhost:8000
 
-# 3k_v.2.2.6
+# 3k_v.2.2.7
