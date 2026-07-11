@@ -24,7 +24,7 @@
             <birthday-selector class="grid grid-cols-[1.5fr_1fr_1fr] gap-2 mb-1">
                 <div @click.outside="selectMonth = false" class="relative">
                     <div @click="selectMonth = !selectMonth" class="bg-neutral-100 px-3 h-11 flex items-center justify-between rounded-sm cursor-pointer">
-                        <p x-text="month || 'Month'" class="select-none" x-bind:class="month ? 'text-black' : 'text-neutral-400'">เดือน</p>
+                        <p x-text="month || 'เดือน'" class="select-none" x-bind:class="month ? 'text-black' : 'text-neutral-400'">เดือน</p>
                         <div x-bind:class="selectMonth ? 'rotate-180' : 'rotate-0'" class="w-4 h-4 transition-transform duration-300">
                             <svg viewBox="0 0 48 48">
                                 <path d="M25.5187 35.2284C24.7205 36.1596 23.2798 36.1596 22.4816 35.2284L8.83008 19.3016C7.71807 18.0042 8.63988 16 10.3486 16H37.6517C39.3604 16 40.2822 18.0042 39.1702 19.3016L25.5187 35.2284Z"></path>
@@ -41,7 +41,7 @@
                 </div>
                 <div @click.outside="selectDay = false" class="relative">
                     <div @click="selectDay = !selectDay" class="bg-neutral-100 px-3 h-11 flex items-center justify-between rounded-sm cursor-pointer">
-                        <p x-text="day || 'Day'" class="select-none" x-bind:class="day ? 'text-black' : 'text-neutral-400'">วัน</p>
+                        <p x-text="day || 'วัน'" class="select-none" x-bind:class="day ? 'text-black' : 'text-neutral-400'">วัน</p>
                         <div x-bind:class="selectDay ? 'rotate-180' : 'rotate-0'" class="w-4 h-4 transition-transform duration-300">
                             <svg viewBox="0 0 48 48">
                                 <path d="M25.5187 35.2284C24.7205 36.1596 23.2798 36.1596 22.4816 35.2284L8.83008 19.3016C7.71807 18.0042 8.63988 16 10.3486 16H37.6517C39.3604 16 40.2822 18.0042 39.1702 19.3016L25.5187 35.2284Z"></path>
@@ -58,7 +58,7 @@
                 </div>
                 <div @click.outside="selectYear = false" class="relative">
                     <div @click="selectYear = !selectYear" class="bg-neutral-100 px-3 h-11 flex items-center justify-between rounded-sm cursor-pointer">
-                        <p x-text="year || 'Year'" class="select-none" x-bind:class="year ? 'text-black' : 'text-neutral-400'">ปี</p>
+                        <p x-text="year || 'ปี'" class="select-none" x-bind:class="year ? 'text-black' : 'text-neutral-400'">ปี</p>
                         <div x-bind:class="selectYear ? 'rotate-180' : 'rotate-0'" class="w-4 h-4 transition-transform duration-300">
                             <svg viewBox="0 0 48 48">
                                 <path d="M25.5187 35.2284C24.7205 36.1596 23.2798 36.1596 22.4816 35.2284L8.83008 19.3016C7.71807 18.0042 8.63988 16 10.3486 16H37.6517C39.3604 16 40.2822 18.0042 39.1702 19.3016L25.5187 35.2284Z"></path>
@@ -128,7 +128,7 @@
                             hx-swap="innerHTML" 
                             class="input-field !w-1/3 text-center font-medium text-neutral-400 select-none !rounded-none !rounded-r-sm"
                             x-bind:class="email ? 'cursor-pointer !bg-neutral-200 hover:!bg-neutral-300 !text-neutral-500' : '!cursor-not-allowed'">
-                            Send code
+                            กดรับรหัส
                     </button>
                 </verification-code>
                 <div id="code-message" class="text-sm pb-3">
