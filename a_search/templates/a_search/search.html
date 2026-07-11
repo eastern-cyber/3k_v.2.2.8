@@ -1,11 +1,11 @@
-<h2 class="pl-3 mb-7">Search</h2>
+<h2 class="pl-3 mb-7">ค้นหา</h2>
 <div class="relative">
     <form hx-get="{% url 'search' %}"
         hx-trigger="submit"
         hx-target="#main-content"
         hx-push-url="true"
         @keydown.enter="setTimeout(() => { showDrawer = false }, 50)">
-        <input name="q" x-model="searchQuery" type="search" placeholder="Search" 
+        <input name="q" x-model="searchQuery" type="search" placeholder="ค้นหา" 
             hx-get="{% url 'search_suggestions' %}" 
             hx-trigger="input delay:300ms"
             hx-target="#search_suggestions"
