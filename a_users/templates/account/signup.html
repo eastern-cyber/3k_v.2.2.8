@@ -82,12 +82,12 @@
             
             <p class="font-medium text-sm mb-1">อีเมล</p>
             <div class="flex flex-col gap-2 mb-4">
-                <input x-model="email" name="email" type="email" placeholder="Email address" class="input-field" value="">
+                <input x-model="email" name="email" type="email" placeholder="อีเมล" class="input-field" value="">
                 {% if form.email.errors %}
                     {{ form.email.errors }}
                 {% endif %}
                 <password-one x-data="{ password_show: false }" class="grid relative w-full">
-                    <input x-model="password1" name="password1" x-bind:type="password_show ? 'text' : 'password'" placeholder="Password" class="input-field" value="">
+                    <input x-model="password1" name="password1" x-bind:type="password_show ? 'text' : 'password'" placeholder="ตั้งรหัสผ่าน" class="input-field" value="">
                     {% if form.password1.errors %}
                         {{ form.password1.errors }}
                     {% endif %}
@@ -103,7 +103,7 @@
                     </a>
                 </password-one>
                 <password-two x-data="{ password_show: false }" class="grid relative w-full">
-                    <input x-model="password2" name="password2" x-bind:type="password_show ? 'text' : 'password'" placeholder="Password (again)" class="input-field" value="">
+                    <input x-model="password2" name="password2" x-bind:type="password_show ? 'text' : 'password'" placeholder="ตั้งรหัสผ่าน (อีกครั้ง)" class="input-field" value="">
                     {% if form.password2.errors %}
                         {{ form.password2.errors }}
                     {% endif %}
@@ -140,7 +140,7 @@
 
             <div class="mb-4">
                 <p class="font-medium text-sm mb-1">กำหนดชื่อผู้ใช้งาน</p>
-                <input x-model="username" name="username" type="text" placeholder="Username" class="input-field" value=""> 
+                <input x-model="username" name="username" type="text" placeholder="ชื่อผู้ใช้" class="input-field" value=""> 
                 {% if form.username.errors %}
                     {{ form.username.errors }}
                 {% endif %}
