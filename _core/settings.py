@@ -39,8 +39,10 @@ else:
 ALLOWED_HOSTS = [
     'v226.3kok.app',
     'v227.3kok.app',
+    'v228.3kok.app',
     '3k-v226.up.railway.app',
     '3k-v227.up.railway.app',
+    '3k-v228.up.railway.app',
     'healthcheck.railway.app',
     '127.0.0.1',
     'localhost'
@@ -49,8 +51,10 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://v226.3kok.app',
     'https://v227.3kok.app',
+    'https://v228.3kok.app',
     'https://3k-v226.up.railway.app',
     'https://3k-v227.up.railway.app',
+    'https://3k-v228.up.railway.app',
     'https://127.0.0.1',
     'https://localhost'
 ]
