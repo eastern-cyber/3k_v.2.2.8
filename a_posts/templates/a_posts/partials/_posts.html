@@ -1,4 +1,103 @@
 {% load static %}
+
+<style>
+/* Mobile full-screen fix - keeps all original functionality */
+@media (max-width: 768px) {
+    /* Make article full screen */
+    article {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+    }
+    
+    /* Make the container full screen */
+    article .relative.bg-black {
+        border-radius: 0 !important;
+        max-height: 100vh !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        aspect-ratio: auto !important;
+    }
+    
+    /* Make video and image full screen */
+    article video,
+    article img {
+        border-radius: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: cover !important;
+    }
+    
+    /* Remove rounded corners */
+    .rounded-2xl {
+        border-radius: 0 !important;
+    }
+    
+    /* Disable snap scrolling on mobile */
+    .snap-center {
+        scroll-snap-align: none !important;
+    }
+    
+    /* Adjust article-buttons position on mobile */
+    article-buttons {
+        position: absolute !important;
+        bottom: 100px !important;
+        right: 10px !important;
+        gap: 10px !important;
+        z-index: 30 !important;
+    }
+    
+    /* Make buttons slightly larger for touch */
+    article-buttons .button-article {
+        width: 48px !important;
+        height: 48px !important;
+    }
+    
+    /* Adjust post info for mobile */
+    article-info .absolute.bottom-0 {
+        bottom: 0 !important;
+    }
+    
+    article-info .p-5 {
+        padding-bottom: 30px !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        padding-top: 15px !important;
+    }
+    
+    article-info .p-5 a {
+        font-size: 16px !important;
+    }
+    
+    article-info .mt-1 a {
+        font-size: 14px !important;
+    }
+    
+    /* Reduce gradient height on mobile */
+    article-info .h-64 {
+        height: 100px !important;
+    }
+    
+    /* Ensure mute button stays visible and clickable */
+    .group .absolute.top-4.left-4 {
+        z-index: 60 !important;
+        opacity: 1 !important;
+    }
+    
+    /* Fix for the -right-17 positioning on mobile */
+    .absolute.-right-17 {
+        right: 10px !important;
+    }
+}
+</style>
+
 {% if posts %}
 {% for post in posts %}
 <article data-index="{{ forloop.counter0|add:page_start_index }}" class="h-full mx-auto py-2 px-4 flex justify-center items-center snap-center">
@@ -149,10 +248,7 @@
 </div>
 {% endif %}
 
-
-
 <script>
-
 window.userWantsSound = false;
 window.currentlyPlayingVideo = null;
 
@@ -167,10 +263,8 @@ function videoPlayer(src) {
 
         init() {
             const video = this.$refs.videoPlayer;
-
             this.muted = !window.userWantsSound;
             video.muted = this.muted;
-
             this.observeVideo(video);
             this.ready = true;
         },
@@ -178,7 +272,6 @@ function videoPlayer(src) {
         observeVideo(video) {
             const observer = new IntersectionObserver(([entry]) => {
                 if (window.pauseAllVideosFlag) {
-                    // If modal is open, force pause and mute
                     video.pause();
                     video.muted = true;
                     return;
@@ -244,5 +337,4 @@ document.body.addEventListener('htmx:afterSwap', (e) => {
         video.load();
     });
 });
-
 </script>
