@@ -26,18 +26,31 @@
         aspect-ratio: auto !important;
     }
     
-    /* Make video and image full screen */
-    article video,
-    article img {
+    /* Make ONLY the main video and image full screen - NOT avatars */
+    article .relative.bg-black > div video,
+    article .relative.bg-black > img {
         border-radius: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
         object-fit: cover !important;
     }
     
-    /* Remove rounded corners */
-    .rounded-2xl {
+    /* Remove rounded corners from the main container only */
+    article .relative.bg-black {
         border-radius: 0 !important;
+    }
+    
+    /* Keep all avatars rounded - this overrides any other border-radius */
+    article .rounded-full {
+        border-radius: 9999px !important;
+    }
+    
+    /* Ensure avatar images maintain their aspect ratio */
+    article .rounded-full img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: 9999px !important;
     }
     
     /* Disable snap scrolling on mobile */
@@ -58,6 +71,17 @@
     article-buttons .button-article {
         width: 48px !important;
         height: 48px !important;
+    }
+    
+    /* Ensure all avatar containers keep their original sizes */
+    article-buttons .size-9 {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    
+    article-buttons .size-13 {
+        width: 52px !important;
+        height: 52px !important;
     }
     
     /* Adjust post info for mobile */
@@ -212,12 +236,12 @@
                         <div class="size-6">
                             <svg viewBox="0 0 20 20">
                                 <path d="M10.938 3.175a.674.674 0 0 1 1.138-.488l6.526 6.215c.574.547.554 1.47-.043 1.991l-6.505 5.676a.674.674 0 0 1-1.116-.508V13.49s-6.985-1.258-9.225 2.854c-.209.384-1.023.518-.857-1.395.692-3.52 2.106-9.017 10.082-9.017z" clip-rule="evenodd"></path>
-                            </svg>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <p class="font-bold text-xs text-neutral-600 dark:text-neutral-400 pt-1">
-                        {{ post.reposts.count }}
-                    </p>
+                        <p class="font-bold text-xs text-neutral-600 dark:text-neutral-400 pt-1">
+                            {{ post.reposts.count }}
+                        </p>
             </button>
 
             {% if post.is_repost and post.author %}
