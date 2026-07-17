@@ -1,7 +1,237 @@
 {% load static %}
-<aside x-data="sidebarComponent()"
-    class="z-20 fixed h-screen w-18 lg:w-60 border-r border-neutral-200 dark:border-neutral-800 lg:border-none transition-all duration-300 ease-in-out" :class="{ '!w-18': showDrawer }">
-    <nav class="relative h-full bg-white dark:bg-black z-10">
+
+<style>
+/* Mobile hamburger menu styles */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.hamburger-btn .bar {
+    display: block;
+    width: 22px;
+    height: 2.5px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-btn .bar:nth-child(1) {
+    transform-origin: top left;
+}
+
+.hamburger-btn .bar:nth-child(3) {
+    transform-origin: bottom left;
+}
+
+.hamburger-btn.active .bar:nth-child(1) {
+    transform: rotate(45deg) translate(2px, -1px);
+}
+
+.hamburger-btn.active .bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger-btn.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translate(2px, 1px);
+}
+
+/* Mobile overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+    display: block;
+    opacity: 1;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: flex !important;
+    }
+    
+    .sidebar-container {
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease-in-out !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100vh !important;
+        z-index: 999 !important;
+        width: 280px !important;
+        border-right: 1px solid var(--color-neutral-200) !important;
+        background: rgba(0, 0, 0, 0.2) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+    }
+    
+    .dark .sidebar-container {
+        border-right-color: var(--color-neutral-800) !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .sidebar-container.open {
+        transform: translateX(0) !important;
+    }
+    
+    .sidebar-overlay.visible {
+        display: block !important;
+        opacity: 1 !important;
+    }
+    
+    /* Fix main content on mobile */
+    #main-content {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    
+    /* Make navigation text white on mobile for better contrast */
+    .sidebar-container .button-nav span,
+    .sidebar-container .button-nav .size-8 {
+        color: white !important;
+        fill: white !important;
+    }
+    
+    .sidebar-container .button-nav:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .sidebar-container .button-nav .text-rose-500 {
+        color: #f43f5e !important;
+        fill: #f43f5e !important;
+    }
+    
+    /* Search button on mobile */
+    .sidebar-container #search {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+    }
+    
+    .sidebar-container #search .text-neutral-400 {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    /* Logo on mobile */
+    .sidebar-container #logo img {
+        filter: brightness(0) invert(1) !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .hamburger-btn {
+        display: none !important;
+    }
+    .sidebar-overlay {
+        display: none !important;
+    }
+    .sidebar-container {
+        transform: translateX(0) !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        overflow-y: auto !important;
+        flex-shrink: 0 !important;
+        width: 72px !important;
+        background: rgba(0, 0, 0, 0.2) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .dark .sidebar-container {
+        background: rgba(0, 0, 0, 0.3) !important;
+        border-right-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    .sidebar-container.lg\:w-60 {
+        width: 240px !important;
+    }
+    
+    /* Desktop navigation text color */
+    .sidebar-container .button-nav span {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .sidebar-container .button-nav .size-8 {
+        fill: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .sidebar-container .button-nav:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .sidebar-container .button-nav .text-rose-500 {
+        color: #f43f5e !important;
+        fill: #f43f5e !important;
+    }
+    
+    /* Search button on desktop */
+    .sidebar-container #search {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+    }
+    
+    .sidebar-container #search .text-neutral-400 {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    /* Logo on desktop */
+    .sidebar-container #logo img {
+        filter: brightness(0) invert(1) !important;
+    }
+    
+    /* Footer text on desktop */
+    .sidebar-container .py-4 p {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+}
+</style>
+
+<!-- Hamburger Button -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+</button>
+
+<!-- Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar Container -->
+<aside x-data="sidebarComponent()" 
+       class="sidebar-container z-20 fixed h-screen w-18 lg:w-60 border-r border-neutral-200 dark:border-neutral-800 lg:border-none transition-all duration-300 ease-in-out" 
+       :class="{ '!w-18': showDrawer }"
+       id="sidebarContainer">
+    <nav class="relative h-full z-10">
         <div id="logo" class="pl-4.5 pt-5 mb-3 w-max">
             <a href="/">
                 <div x-show="!darkMode">
@@ -15,7 +245,7 @@
             </a>
         </div>
         <div class="px-4">
-            <button id="search" @click="showDrawer = !showDrawer; showSearch = true" id="search" class="w-full h-10 bg-neutral-100 dark:bg-neutral-800 rounded-full pl-2.5 flex items-center cursor-pointer">
+            <button id="search" @click="showDrawer = !showDrawer; showSearch = true" class="w-full h-10 bg-neutral-100 dark:bg-neutral-800 rounded-full pl-2.5 flex items-center cursor-pointer">
                 <div class="size-5 flex-shrink-0">
                     <svg viewBox="0 0 48 48">
                         <path d="M21.83 7.5a14.34 14.34 0 1 1 0 28.68 14.34 14.34 0 0 1 0-28.68Zm0-4a18.33 18.33 0 1 0 11.48 32.64l8.9 8.9a1 1 0 0 0 1.42 0l1.4-1.41a1 1 0 0 0 0-1.42l-8.89-8.9A18.34 18.34 0 0 0 21.83 3.5Z"></path>
@@ -157,7 +387,6 @@
 </aside>
 
 <script>
-
     function sidebarComponent() {
         return { 
             showDrawer: false,
@@ -177,4 +406,64 @@
         }
     }
 
+    // Hamburger menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebarContainer = document.getElementById('sidebarContainer');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        // Only add mobile functionality on mobile
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+        
+        function toggleSidebar() {
+            if (!isMobile()) return;
+            sidebarContainer.classList.toggle('open');
+            hamburgerBtn.classList.toggle('active');
+            sidebarOverlay.classList.toggle('visible');
+            document.body.style.overflow = sidebarContainer.classList.contains('open') ? 'hidden' : '';
+        }
+        
+        function closeSidebar() {
+            if (!isMobile()) return;
+            sidebarContainer.classList.remove('open');
+            hamburgerBtn.classList.remove('active');
+            sidebarOverlay.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+        
+        // Event listeners
+        hamburgerBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        
+        // Close sidebar when a navigation link is clicked
+        document.querySelectorAll('#navigation button, #search').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (isMobile() && this.closest('#navigation')) {
+                    setTimeout(closeSidebar, 200);
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (!isMobile()) {
+                closeSidebar();
+                sidebarContainer.classList.remove('open');
+                hamburgerBtn.classList.remove('active');
+                sidebarOverlay.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Also close when clicking any link inside navigation
+        document.querySelectorAll('#navigation a, #navigation button').forEach(el => {
+            el.addEventListener('click', function() {
+                if (isMobile()) {
+                    setTimeout(closeSidebar, 250);
+                }
+            });
+        });
+    });
 </script>

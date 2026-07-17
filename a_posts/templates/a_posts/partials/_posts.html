@@ -12,6 +12,8 @@
         max-width: 100vw !important;
         max-height: 100vh !important;
         overflow: hidden !important;
+        /* Shift left to compensate for sidebar - ONLY ON MOBILE */
+        margin-left: calc(-1 * (100vw - 100%) / 2) !important;
     }
     
     /* Make the container full screen */
@@ -51,11 +53,6 @@
         height: 100% !important;
         object-fit: cover !important;
         border-radius: 9999px !important;
-    }
-    
-    /* Disable snap scrolling on mobile */
-    .snap-center {
-        scroll-snap-align: none !important;
     }
     
     /* Adjust article-buttons position on mobile */
@@ -118,6 +115,22 @@
     /* Fix for the -right-17 positioning on mobile */
     .absolute.-right-17 {
         right: 10px !important;
+    }
+}
+
+/* Fix desktop layout - remove extra spacing */
+@media (min-width: 769px) {
+    /* Remove padding from article on desktop */
+    article.py-2.px-4 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* Ensure the container doesn't have extra margin */
+    article .relative.bg-black {
+        margin: 0 auto !important;
     }
 }
 </style>
@@ -236,12 +249,12 @@
                         <div class="size-6">
                             <svg viewBox="0 0 20 20">
                                 <path d="M10.938 3.175a.674.674 0 0 1 1.138-.488l6.526 6.215c.574.547.554 1.47-.043 1.991l-6.505 5.676a.674.674 0 0 1-1.116-.508V13.49s-6.985-1.258-9.225 2.854c-.209.384-1.023.518-.857-1.395.692-3.52 2.106-9.017 10.082-9.017z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
+                            </svg>
                         </div>
-                        <p class="font-bold text-xs text-neutral-600 dark:text-neutral-400 pt-1">
-                            {{ post.reposts.count }}
-                        </p>
+                    </div>
+                    <p class="font-bold text-xs text-neutral-600 dark:text-neutral-400 pt-1">
+                        {{ post.reposts.count }}
+                    </p>
             </button>
 
             {% if post.is_repost and post.author %}
