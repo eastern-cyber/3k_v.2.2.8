@@ -334,12 +334,14 @@
                     </a>
                 </li>
                 <!-- In the "อื่นๆ" (More) section, replace the logout form with this: -->
+                <!-- In the "อื่นๆ" (More) section -->
+                <!-- In the "อื่นๆ" (More) section -->
                 <li>
-                    <form method="post" action="{% url 'account_logout' %}" id="logout-form">
+                    <button onclick="logoutUser()" class="button-rounded dark:hover:!bg-neutral-800 w-full text-left">
+                        <span class="font-medium">ล็อกเอ้าท์</span>
+                    </button>
+                    <form method="post" action="{% url 'account_logout' %}" id="logout-form" style="display:none;">
                         {% csrf_token %}
-                        <button type="submit" class="button-rounded dark:hover:!bg-neutral-800 w-full text-left">
-                            <span class="font-medium">ล็อกเอ้าท์</span>
-                        </button>
                     </form>
                 </li>
             </ul>
@@ -388,6 +390,16 @@
 </aside>
 
 <script>
+    function logoutUser() {
+        const form = document.getElementById('logout-form');
+        if (form) {
+            form.submit();
+        } else {
+            // Fallback: redirect to logout URL
+            window.location.href = "{% url 'account_logout' %}";
+        }
+    }
+    
     function sidebarComponent() {
         return { 
             showDrawer: false,
