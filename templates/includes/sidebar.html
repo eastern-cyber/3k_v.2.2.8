@@ -333,10 +333,11 @@
                         <span class="font-medium">ตั้งค่า</span>
                     </a>
                 </li>
+                <!-- In the "อื่นๆ" (More) section, replace the logout form with this: -->
                 <li>
-                    <form method="post" action="{% url 'account_logout' %}" >
+                    <form method="post" action="{% url 'account_logout' %}" id="logout-form">
                         {% csrf_token %}
-                        <button type="submit" class="button-rounded dark:hover:!bg-neutral-800">
+                        <button type="submit" class="button-rounded dark:hover:!bg-neutral-800 w-full text-left">
                             <span class="font-medium">ล็อกเอ้าท์</span>
                         </button>
                     </form>
