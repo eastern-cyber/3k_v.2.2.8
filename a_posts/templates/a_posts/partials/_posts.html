@@ -106,10 +106,26 @@
         height: 100px !important;
     }
     
-    /* Ensure mute button stays visible and clickable */
+    /* Move mute button to top-right and increase z-index */
     .group .absolute.top-4.left-4 {
-        z-index: 60 !important;
+        top: 12px !important;
+        left: auto !important;
+        right: 12px !important;
+        z-index: 1002 !important;
         opacity: 1 !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    /* Make mute button larger on mobile for better touch */
+    .group .absolute.top-4.left-4 {
+        padding: 10px !important;
+        width: 44px !important;
+        height: 44px !important;
+    }
+    
+    .group .absolute.top-4.left-4 .size-5 {
+        width: 20px !important;
+        height: 20px !important;
     }
     
     /* Fix for the -right-17 positioning on mobile */
@@ -118,19 +134,30 @@
     }
 }
 
-/* Fix desktop layout - remove extra spacing */
+/* Fix desktop layout - remove all extra spacing */
 @media (min-width: 769px) {
-    /* Remove padding from article on desktop */
-    article.py-2.px-4 {
+    /* Reset article spacing on desktop */
+    article {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        min-height: auto !important;
+        height: auto !important;
     }
     
-    /* Ensure the container doesn't have extra margin */
+    /* Ensure the container is properly centered with no extra space */
     article .relative.bg-black {
         margin: 0 auto !important;
+        top: 0 !important;
+    }
+    
+    /* Fix the flex container */
+    .flex.justify-center.items-center {
+        min-height: auto !important;
+        padding: 0 !important;
     }
 }
 </style>
@@ -163,6 +190,7 @@
                     </div>
                 </div>
             </button>
+            <!-- Mute button - repositioned to top-right -->
             <button @click="toggleMute" 
                     class="absolute top-4 left-4 bg-black/20 p-3 rounded-full z-20 
                         opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity 
