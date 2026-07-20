@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import get_user_model, logout, login
+from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import HttpResponse
@@ -16,6 +16,7 @@ from threading import Thread
 
 from allauth.account.models import EmailAddress
 from allauth.account.forms import SignupForm
+from allauth.account.utils import perform_login
 
 from .forms import ProfileForm, EmailForm, BirthdayForm
 
@@ -201,7 +202,9 @@ def signup_otp_view(request):
             cache.delete(f"verification_code_{email}")
             cache.delete(f"otp_attempts_{email}")
             
-            login(request, user)
+            # Log the user in using AllAuth's perform_login
+            perform_login(request, user, 'django.contrib.auth.backends.ModelBackend')
+            
             messages.success(request, '🎉 ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่ KokKokKok')
             
             return redirect(request.GET.get('next', '/'))
