@@ -86,51 +86,43 @@ def get_otp_email_content(code):
 
 
 def send_otp_email(email, code):
-    """Send OTP using Mailgun API (works on Railway)"""
+    """Send OTP using Resend API"""
     
-    api_key = os.getenv('MAILGUN_API_KEY', '')
-    domain = os.getenv('MAILGUN_DOMAIN', 'mail.3kok.app')
-    from_email = f'KokKokKok <admin@{domain}>'
+    api_key = os.getenv('RESEND_API_KEY', '')
     
     if not api_key:
-        print("❌ MAILGUN_API_KEY not set - email not sent")
+        print("❌ RESEND_API_KEY not set - email not sent")
         return False
     
     html_content, plain_text = get_otp_email_content(code)
     
-    # Mailgun API endpoint
-    url = f"https://api.mailgun.net/v3/{domain}/messages"
-    
-    # Mailgun API data
+    # Resend API
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
     data = {
-        'from': from_email,
-        'to': [email],
-        'subject': '🔐 รหัสยืนยัน KokKokKok',
-        'text': plain_text,
-        'html': html_content,
+        "from": "KokKokKok <onboarding@resend.dev>",  # Resend's default domain
+        "to": [email],
+        "subject": "🔐 รหัสยืนยัน KokKokKok",
+        "html": html_content,
+        "text": plain_text,
     }
     
     try:
-        response = requests.post(
-            url,
-            auth=('api', api_key),
-            data=data,
-            timeout=30,
-        )
+        response = requests.post(url, headers=headers, json=data, timeout=30)
         
         if response.status_code == 200:
-            print(f"✅ Mailgun API: Email sent to {email}")
+            print(f"✅ Resend: Email sent to {email}")
             return True
         else:
-            print(f"❌ Mailgun API error: {response.status_code}")
-            print(f"   Response: {response.text[:200]}...")
+            print(f"❌ Resend error: {response.status_code}")
+            print(f"   Response: {response.text[:200]}")
             return False
             
-    except requests.exceptions.Timeout:
-        print(f"❌ Mailgun API timeout for {email}")
-        return False
     except requests.exceptions.RequestException as e:
-        print(f"❌ Mailgun API request failed: {e}")
+        print(f"❌ Resend request failed: {e}")
         return False
 
 
