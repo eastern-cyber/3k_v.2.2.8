@@ -4,13 +4,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from allauth.account.views import PasswordChangeView
 from a_posts.views import *
-from a_users.views import profile_view, index_view
+from a_users.views import profile_view, index_view, signup_otp_view  # Add this import
 
 urlpatterns = [
     path('', home_view, name="home"),
     path('admin/', admin.site.urls),
     path("accounts/password/change/", PasswordChangeView.as_view(success_url=reverse_lazy("settings")), name="account_change_password"),
+    
+    # Use function-based view for signup with OTP
+    path('accounts/signup/', signup_otp_view, name='account_signup'),
+    
+    # Keep allauth URLs for other features
     path('accounts/', include('allauth.urls')),
+    
     path('login/', index_view, name="index"),
     path('@<username>/', profile_view, name="profile"),
     path('explore/', explore_view, name="explore"),

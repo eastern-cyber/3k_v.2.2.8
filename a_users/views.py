@@ -9,14 +9,12 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-from django.utils.decorators import method_decorator
 
 import random
 import time
 from threading import Thread
 
 from allauth.account.models import EmailAddress
-from allauth.account.views import SignupView as AllAuthSignupView
 from allauth.account.forms import SignupForm
 
 from .forms import ProfileForm, EmailForm, BirthdayForm
@@ -29,10 +27,7 @@ User = get_user_model()
 # ============================================================================
 
 def send_email_with_retry(email, max_retries=3):
-    """
-    Send email with exponential backoff retry logic.
-    Handles both plain text and HTML emails.
-    """
+    """Send email with exponential backoff retry logic."""
     for attempt in range(max_retries):
         try:
             email.send(fail_silently=False)
@@ -41,17 +36,13 @@ def send_email_with_retry(email, max_retries=3):
         except Exception as e:
             print(f"❌ Email attempt {attempt + 1} failed: {e}")
             if attempt < max_retries - 1:
-                wait_time = 2 ** attempt  # 1, 2, 4 seconds
-                print(f"⏳ Retrying in {wait_time}s...")
+                wait_time = 2 ** attempt
                 time.sleep(wait_time)
-    
-    print(f"❌ Failed to send email after {max_retries} attempts")
     return False
 
 
 def get_otp_email_content(code):
     """Generate HTML and plain text email content for OTP verification"""
-    
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -118,11 +109,8 @@ def send_otp_email(email, code):
     )
     email_message.attach_alternative(html_content, "text/html")
     
-    # Send in background thread to avoid blocking
     thread = Thread(target=send_email_with_retry, args=(email_message,))
     thread.start()
-    
-    return True
 
 
 # ============================================================================
@@ -136,28 +124,23 @@ def verification_code(request):
     if not email:
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ กรุณากรอกอีเมล</p>')
     
-    # Rate limiting: 1 request per 60 seconds
     rate_key = f"otp_rate_{email}"
     if cache.get(rate_key):
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ กรุณารอ 60 วินาทีก่อนขอรหัสใหม่</p>')
     
-    # Validate email format
     try:
         validate_email(email)
     except:
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ อีเมลไม่ถูกต้อง</p>')
     
-    # Check if email already registered
     if User.objects.filter(email=email).exists():
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ อีเมลนี้ถูกใช้งานแล้ว</p>')
     
-    # Generate and store OTP
     code = str(random.randint(100000, 999999))
-    cache.set(f"verification_code_{email}", code, timeout=300)  # 5 minutes
+    cache.set(f"verification_code_{email}", code, timeout=300)
     cache.set(f"otp_attempts_{email}", 0, timeout=300)
-    cache.set(rate_key, True, 60)  # Rate limit: 60 seconds
+    cache.set(rate_key, True, 60)
     
-    # Send email
     send_otp_email(email, code)
     
     return HttpResponse("""
@@ -174,75 +157,9 @@ def verification_code(request):
 # Custom Signup with OTP Verification
 # ============================================================================
 
-@method_decorator(csrf_protect, name='dispatch')
-class CustomSignupView(AllAuthSignupView):
-    """Custom signup view with OTP verification"""
-    
-    def form_valid(self, form):
-        email = form.cleaned_data.get('email')
-        entered_code = self.request.POST.get('code', '').strip()
-        
-        # Validate OTP
-        error_response = self._validate_otp(email, entered_code)
-        if error_response:
-            return error_response
-        
-        # OTP verified - create user
-        user = form.save(self.request)
-        user.is_active = True
-        user.save()
-        
-        # Clean up cache
-        cache.delete(f"verification_code_{email}")
-        cache.delete(f"otp_attempts_{email}")
-        
-        # Log user in
-        login(self.request, user)
-        messages.success(self.request, '🎉 ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่ KokKokKok')
-        
-        return redirect(self.get_success_url())
-    
-    def _validate_otp(self, email, entered_code):
-        """Validate OTP and return error response if invalid"""
-        
-        if not entered_code:
-            messages.error(self.request, '⚠️ กรุณากรอกรหัสยืนยันที่ส่งไปทางอีเมล')
-            return self._render_error_response()
-        
-        stored_code = cache.get(f"verification_code_{email}")
-        attempts = cache.get(f"otp_attempts_{email}", 0)
-        
-        if not stored_code:
-            messages.error(self.request, '⚠️ รหัสหมดอายุหรือไม่ถูกต้อง กรุณาขอรหัสใหม่')
-            return self._render_error_response()
-        
-        if attempts >= 3:
-            messages.error(self.request, '⚠️ ผิดพลาดเกิน 3 ครั้ง กรุณาขอรหัสใหม่')
-            cache.delete(f"verification_code_{email}")
-            return self._render_error_response()
-        
-        if stored_code != entered_code:
-            cache.set(f"otp_attempts_{email}", attempts + 1, timeout=300)
-            remaining = 3 - (attempts + 1)
-            messages.error(self.request, f'⚠️ รหัสไม่ถูกต้อง เหลือโอกาส {remaining} ครั้ง')
-            return self._render_error_response()
-        
-        return None  # OTP is valid
-    
-    def _render_error_response(self):
-        """Render signup page with error messages"""
-        from allauth.account.forms import SignupForm
-        form = SignupForm(self.request.POST or None)
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-# ============================================================================
-# Alternative: Function-based Signup View (Simpler)
-# ============================================================================
-
 @csrf_protect
 def signup_otp_view(request):
-    """Function-based signup with OTP verification (simpler alternative)"""
+    """Function-based signup with OTP verification"""
     
     if request.user.is_authenticated:
         return redirect('/')
@@ -254,7 +171,6 @@ def signup_otp_view(request):
             email = form.cleaned_data.get('email')
             entered_code = request.POST.get('code', '').strip()
             
-            # Validate OTP
             if not entered_code:
                 messages.error(request, '⚠️ กรุณากรอกรหัสยืนยันที่ส่งไปทางอีเมล')
                 return render(request, 'account/signup.html', {'form': form})
@@ -282,11 +198,9 @@ def signup_otp_view(request):
             user.is_active = True
             user.save()
             
-            # Clean up cache
             cache.delete(f"verification_code_{email}")
             cache.delete(f"otp_attempts_{email}")
             
-            # Log user in
             login(request, user)
             messages.success(request, '🎉 ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่ KokKokKok')
             
