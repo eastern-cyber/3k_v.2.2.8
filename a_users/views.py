@@ -10,6 +10,9 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 
+import requests
+from django.conf import settings
+
 import random
 import time
 from threading import Thread
@@ -99,23 +102,48 @@ def get_otp_email_content(code):
 
 
 def send_otp_email(email, code):
-    """Send OTP verification email using Mailgun"""
+    """Send OTP using Mailgun API (works on Railway)"""
     
-    from django.conf import settings
+    api_key = os.environ.get('MAILGUN_API_KEY', '')
+    domain = os.environ.get('MAILGUN_DOMAIN', 'mail.3kok.app')
+    from_email = f'KokKokKok <admin@{domain}>'
+    
+    if not api_key:
+        print("❌ MAILGUN_API_KEY not set")
+        return
     
     html_content, plain_text = get_otp_email_content(code)
     
-    email_message = EmailMultiAlternatives(
-        subject="🔐 รหัสยืนยัน KokKokKok",
-        body=plain_text,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[email],
-    )
-    email_message.attach_alternative(html_content, "text/html")
+    # Mailgun API endpoint
+    url = f"https://api.mailgun.net/v3/{domain}/messages"
     
-    thread = Thread(target=send_email_with_retry, args=(email_message,))
-    thread.start()
+    # Mailgun API data
+    data = {
+        'from': from_email,
+        'to': [email],
+        'subject': '🔐 รหัสยืนยัน KokKokKok',
+        'text': plain_text,
+        'html': html_content,
+    }
     
+    try:
+        response = requests.post(
+            url,
+            auth=('api', api_key),
+            data=data,
+            timeout=30,
+        )
+        
+        if response.status_code == 200:
+            print(f"✅ Mailgun API: Email sent to {email}")
+            return True
+        else:
+            print(f"❌ Mailgun API error: {response.status_code} - {response.text}")
+            return False
+            
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Mailgun API request failed: {e}")
+        return False
 
 # ============================================================================
 # OTP Verification View
@@ -145,6 +173,7 @@ def verification_code(request):
     cache.set(f"otp_attempts_{email}", 0, timeout=300)
     cache.set(rate_key, True, 60)
     
+    # Send using Mailgun API
     send_otp_email(email, code)
     
     return HttpResponse("""
