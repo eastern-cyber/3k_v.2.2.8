@@ -227,19 +227,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'a_users.CustomUser'
 
-# Google SMTP Configuration
-# These will be set as environment variables in Railway
-    
-if ENVIRONMENT == 'development':
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
+# ============================================================================
+# Email Configuration - Mailgun
+# ============================================================================
+
+MAILGUN_SMTP_HOST = os.environ.get('MAILGUN_SMTP_HOST', 'smtp.mailgun.org')
+MAILGUN_SMTP_PORT = int(os.environ.get('MAILGUN_SMTP_PORT', 587))
+MAILGUN_SMTP_USERNAME = os.environ.get('MAILGUN_SMTP_USERNAME', '')
+MAILGUN_SMTP_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
+MAILGUN_FROM_EMAIL = os.environ.get('MAILGUN_FROM_EMAIL', 'admin@mail.3kok.app')
+
+if ENVIRONMENT == 'production':
+    # Use Mailgun SMTP
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Your Gmail address
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # The 16-character app password
-    EMAIL_PORT = 587
+    EMAIL_HOST = MAILGUN_SMTP_HOST
+    EMAIL_PORT = MAILGUN_SMTP_PORT
     EMAIL_USE_TLS = True
-    DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@3kok.app')
+    EMAIL_HOST_USER = MAILGUN_SMTP_USERNAME
+    EMAIL_HOST_PASSWORD = MAILGUN_SMTP_PASSWORD
+    DEFAULT_FROM_EMAIL = f'KokKokKok <{MAILGUN_FROM_EMAIL}>'
+else:
+    # Development - console backend
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@kokkokkok.com'
 
 # Authentication settings
 LOGIN_URL = '/login/'
@@ -256,3 +266,7 @@ SOCIALACCOUNT_ADAPTER = "a_users.adapters.socialSignupAdapter"
 # Security settings for Railway
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+# AllAuth email settings
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+DEFAULT_FROM_EMAIL = f'KokKokKok <{MAILGUN_FROM_EMAIL}>'

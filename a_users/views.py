@@ -99,20 +99,23 @@ def get_otp_email_content(code):
 
 
 def send_otp_email(email, code):
-    """Send OTP verification email"""
+    """Send OTP verification email using Mailgun"""
+    
+    from django.conf import settings
+    
     html_content, plain_text = get_otp_email_content(code)
     
     email_message = EmailMultiAlternatives(
         subject="🔐 รหัสยืนยัน KokKokKok",
         body=plain_text,
-        from_email="KokKokKok <noreply@kokkokkok.com>",
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=[email],
     )
     email_message.attach_alternative(html_content, "text/html")
     
     thread = Thread(target=send_email_with_retry, args=(email_message,))
     thread.start()
-
+    
 
 # ============================================================================
 # OTP Verification View
