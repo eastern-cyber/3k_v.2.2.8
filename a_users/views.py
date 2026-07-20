@@ -1,21 +1,19 @@
+import os
+import random
+import time
+import requests
+from threading import Thread
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model, logout, login
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import HttpResponse
 from django.db.models import Count
 from django.core.validators import validate_email
 from django.core.cache import cache
-from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-
-import requests
-from django.conf import settings
-
-import random
-import time
-from threading import Thread
 
 from allauth.account.models import EmailAddress
 from allauth.account.forms import SignupForm
@@ -27,26 +25,12 @@ User = get_user_model()
 
 
 # ============================================================================
-# OTP Email Functions
+# OTP Email Functions (Mailgun API)
 # ============================================================================
-
-def send_email_with_retry(email, max_retries=3):
-    """Send email with exponential backoff retry logic."""
-    for attempt in range(max_retries):
-        try:
-            email.send(fail_silently=False)
-            print(f"✅ Email sent successfully (attempt {attempt + 1})")
-            return True
-        except Exception as e:
-            print(f"❌ Email attempt {attempt + 1} failed: {e}")
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt
-                time.sleep(wait_time)
-    return False
-
 
 def get_otp_email_content(code):
     """Generate HTML and plain text email content for OTP verification"""
+    
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -104,13 +88,13 @@ def get_otp_email_content(code):
 def send_otp_email(email, code):
     """Send OTP using Mailgun API (works on Railway)"""
     
-    api_key = os.environ.get('MAILGUN_API_KEY', '')
-    domain = os.environ.get('MAILGUN_DOMAIN', 'mail.3kok.app')
+    api_key = os.getenv('MAILGUN_API_KEY', '')
+    domain = os.getenv('MAILGUN_DOMAIN', 'mail.3kok.app')
     from_email = f'KokKokKok <admin@{domain}>'
     
     if not api_key:
-        print("❌ MAILGUN_API_KEY not set")
-        return
+        print("❌ MAILGUN_API_KEY not set - email not sent")
+        return False
     
     html_content, plain_text = get_otp_email_content(code)
     
@@ -138,12 +122,17 @@ def send_otp_email(email, code):
             print(f"✅ Mailgun API: Email sent to {email}")
             return True
         else:
-            print(f"❌ Mailgun API error: {response.status_code} - {response.text}")
+            print(f"❌ Mailgun API error: {response.status_code}")
+            print(f"   Response: {response.text[:200]}...")
             return False
             
+    except requests.exceptions.Timeout:
+        print(f"❌ Mailgun API timeout for {email}")
+        return False
     except requests.exceptions.RequestException as e:
         print(f"❌ Mailgun API request failed: {e}")
         return False
+
 
 # ============================================================================
 # OTP Verification View
@@ -156,25 +145,29 @@ def verification_code(request):
     if not email:
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ กรุณากรอกอีเมล</p>')
     
+    # Rate limiting: 1 request per 60 seconds
     rate_key = f"otp_rate_{email}"
     if cache.get(rate_key):
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ กรุณารอ 60 วินาทีก่อนขอรหัสใหม่</p>')
     
+    # Validate email format
     try:
         validate_email(email)
     except:
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ อีเมลไม่ถูกต้อง</p>')
     
+    # Check if email already registered
     if User.objects.filter(email=email).exists():
         return HttpResponse('<p class="text-rose-500 text-sm">⚠️ อีเมลนี้ถูกใช้งานแล้ว</p>')
     
+    # Generate and store OTP
     code = str(random.randint(100000, 999999))
-    cache.set(f"verification_code_{email}", code, timeout=300)
+    cache.set(f"verification_code_{email}", code, timeout=300)  # 5 minutes
     cache.set(f"otp_attempts_{email}", 0, timeout=300)
-    cache.set(rate_key, True, 60)
+    cache.set(rate_key, True, 60)  # Rate limit: 60 seconds
     
-    # Send using Mailgun API
-    send_otp_email(email, code)
+    # Send email using Mailgun API (non-blocking)
+    Thread(target=send_otp_email, args=(email, code)).start()
     
     return HttpResponse("""
         <div class="text-emerald-600 text-sm flex items-center gap-2">
@@ -204,6 +197,7 @@ def signup_otp_view(request):
             email = form.cleaned_data.get('email')
             entered_code = request.POST.get('code', '').strip()
             
+            # Validate OTP
             if not entered_code:
                 messages.error(request, '⚠️ กรุณากรอกรหัสยืนยันที่ส่งไปทางอีเมล')
                 return render(request, 'account/signup.html', {'form': form})
@@ -231,10 +225,11 @@ def signup_otp_view(request):
             user.is_active = True
             user.save()
             
+            # Clean up cache
             cache.delete(f"verification_code_{email}")
             cache.delete(f"otp_attempts_{email}")
             
-            # Log the user in using AllAuth's perform_login
+            # Log the user in
             perform_login(request, user, 'django.contrib.auth.backends.ModelBackend')
             
             messages.success(request, '🎉 ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่ KokKokKok')
@@ -247,7 +242,7 @@ def signup_otp_view(request):
 
 
 # ============================================================================
-# Other Views
+# Other Views (unchanged)
 # ============================================================================
 
 def index_view(request):
