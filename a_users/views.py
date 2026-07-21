@@ -103,7 +103,7 @@ def send_otp_email(email, code):
         "Content-Type": "application/json",
     }
     data = {
-        "from": "KokKokKok <onboarding@resend.dev>",  # Resend's default domain
+        "from": "KokKokKok <noreply@mail.3kok.app>",  # Resend's default domain
         "to": [email],
         "subject": "🔐 รหัสยืนยัน KokKokKok",
         "html": html_content,
