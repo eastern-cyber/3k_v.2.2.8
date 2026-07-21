@@ -23,17 +23,11 @@ env.read_env()
 
 ENVIRONMENT = env('ENVIRONMENT', default='development')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENVIRONMENT == 'development':
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = ENVIRONMENT == 'development'
 
 # Allow all hosts initially (update with your Railway domain later)
 ALLOWED_HOSTS = [
@@ -60,7 +54,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Application definition
-
 INSTALLED_APPS = [
     'daphne',
     'channels',
@@ -92,16 +85,10 @@ INSTALLED_APPS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
+        'SCOPE': ['profile', 'email'],
     },
     'facebook': {
-        'SCOPE': [
-            'public_profile',
-            'email', 
-        ],
+        'SCOPE': ['public_profile', 'email'],
     },
 }
 
@@ -145,16 +132,14 @@ TEMPLATES = [
 
 ASGI_APPLICATION = '_core.asgi.application'
 
+# Channels - Use InMemoryChannelLayer (Redis can be added later)
 CHANNEL_LAYERS = {
     'default': {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     }
 }
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# Use Neon PostgreSQL in production (via DATABASE_URL environment variable)
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
@@ -163,7 +148,6 @@ if os.environ.get('DATABASE_URL'):
         )
     }
 else:
-    # Keep SQLite for local development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -172,8 +156,6 @@ else:
     }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -190,75 +172,62 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files (user uploads)
+# Media files
 if ENVIRONMENT == "development":
-    MEDIA_ROOT = BASE_DIR / "media"           # Local: ./media/
+    MEDIA_ROOT = BASE_DIR / "media"
 else:
-    MEDIA_ROOT = "/app/media"                 # Production: Railway volume
+    MEDIA_ROOT = "/app/media"
 
-MEDIA_URL = '/media/'                         # URL prefix for media files
+MEDIA_URL = '/media/'
 
-# Ensure media directory exists in production
 if ENVIRONMENT == "production":
     os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 AUTH_USER_MODEL = 'a_users.CustomUser'
 
 # ============================================================================
-# Email Configuration - Mailgun
+# Email Configuration - Resend
 # ============================================================================
 
-MAILGUN_SMTP_HOST = os.environ.get('MAILGUN_SMTP_HOST', 'smtp.mailgun.org')
-MAILGUN_SMTP_PORT = int(os.environ.get('MAILGUN_SMTP_PORT', 587))
-MAILGUN_SMTP_USERNAME = os.environ.get('MAILGUN_SMTP_USERNAME', '')
-MAILGUN_SMTP_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
-MAILGUN_FROM_EMAIL = os.environ.get('MAILGUN_FROM_EMAIL', 'admin@mail.3kok.app')
+RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
 
 if ENVIRONMENT == 'production':
-    # Use Mailgun SMTP
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = MAILGUN_SMTP_HOST
-    EMAIL_PORT = MAILGUN_SMTP_PORT
+    EMAIL_HOST = 'smtp.resend.com'
+    EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = MAILGUN_SMTP_USERNAME
-    EMAIL_HOST_PASSWORD = MAILGUN_SMTP_PASSWORD
-    DEFAULT_FROM_EMAIL = f'KokKokKok <{MAILGUN_FROM_EMAIL}>'
+    EMAIL_HOST_USER = 'resend'  # Literally the word 'resend'
+    EMAIL_HOST_PASSWORD = RESEND_API_KEY
+    DEFAULT_FROM_EMAIL = 'KokKokKok <noreply@mail.3kok.app>'
 else:
-    # Development - console backend
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'noreply@kokkokkok.com'
+    DEFAULT_FROM_EMAIL = 'KokKokKok <noreply@mail.3kok.app>'
+
+# AllAuth email settings
+ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 # Authentication settings
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/' 
+LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_FORMS = {'signup': 'a_users.forms.CustomSignupForm'}
 
 # AllAuth social login settings
-SOCIALACCOUNT_LOGIN_ON_GET = True 
+SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "a_users.adapters.socialSignupAdapter"
@@ -266,7 +235,3 @@ SOCIALACCOUNT_ADAPTER = "a_users.adapters.socialSignupAdapter"
 # Security settings for Railway
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
-
-# AllAuth email settings
-ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-DEFAULT_FROM_EMAIL = f'KokKokKok <{MAILGUN_FROM_EMAIL}>'
