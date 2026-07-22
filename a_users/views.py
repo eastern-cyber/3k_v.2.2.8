@@ -25,7 +25,7 @@ User = get_user_model()
 
 
 # ============================================================================
-# OTP Email Functions (Mailgun API)
+# OTP Email Functions
 # ============================================================================
 
 def get_otp_email_content(code):
@@ -96,14 +96,13 @@ def send_otp_email(email, code):
     
     html_content, plain_text = get_otp_email_content(code)
     
-    # Resend API
     url = "https://api.resend.com/emails"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
     data = {
-        "from": "KokKokKok <noreply@mail.3kok.app>",  # Resend's default domain
+        "from": "KokKokKok <noreply@mail.3kok.app>",
         "to": [email],
         "subject": "🔐 รหัสยืนยัน KokKokKok",
         "html": html_content,
@@ -124,6 +123,191 @@ def send_otp_email(email, code):
     except requests.exceptions.RequestException as e:
         print(f"❌ Resend request failed: {e}")
         return False
+
+
+# ============================================================================
+# Password Reset with OTP (using Resend API)
+# ============================================================================
+
+def send_password_reset_email(email, code):
+    """Send password reset OTP email using Resend API"""
+    
+    api_key = os.getenv('RESEND_API_KEY', '')
+    
+    if not api_key:
+        print("❌ RESEND_API_KEY not set")
+        return False
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>เปลี่ยนรหัสผ่าน</title>
+        <style>
+            body {{ font-family: sans-serif; line-height: 1.6; }}
+            .container {{ max-width: 560px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 16px; }}
+            .header {{ background: linear-gradient(135deg, #EC4899, #8B5CF6); padding: 20px; text-align: center; border-radius: 16px 16px 0 0; color: white; }}
+            .otp-code {{ font-size: 36px; font-weight: bold; text-align: center; padding: 20px; background: white; border-radius: 8px; letter-spacing: 10px; color: #EC4899; }}
+            .info {{ text-align: center; color: #666; margin: 16px 0; }}
+            .warning {{ background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 8px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header"><h1>🔐 เปลี่ยนรหัสผ่าน</h1></div>
+            <div class="content">
+                <p>สวัสดี,</p>
+                <p>คุณได้ขอเปลี่ยนรหัสผ่านสำหรับบัญชี KokKokKok</p>
+                <div class="otp-code">{code}</div>
+                <div class="info">⏱️ รหัสนี้จะหมดอายุใน 5 นาที</div>
+                <div class="warning"><strong>⚠️ คำเตือน:</strong> อย่าแชร์รหัสนี้กับผู้อื่น</div>
+                <p>หากคุณไม่ได้เป็นผู้ขอรหัสนี้ กรุณาเพิกเฉยต่ออีเมลนี้</p>
+            </div>
+            <div class="footer"><p>© 2026 KokKokKok</p></div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    plain_text = f"""
+    สวัสดี,
+
+    คุณได้ขอเปลี่ยนรหัสผ่านสำหรับบัญชี KokKokKok
+
+    รหัสยืนยัน: {code}
+
+    รหัสนี้จะหมดอายุใน 5 นาที
+
+    หากคุณไม่ได้เป็นผู้ขอรหัสนี้ กรุณาเพิกเฉยต่ออีเมลนี้
+
+    — ทีมงาน KokKokKok
+    """
+    
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "from": "KokKokKok <noreply@mail.3kok.app>",
+        "to": [email],
+        "subject": "🔐 รหัสยืนยันเปลี่ยนรหัสผ่าน KokKokKok",
+        "html": html_content,
+        "text": plain_text,
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        if response.status_code == 200:
+            print(f"✅ Password reset email sent to {email}")
+            return True
+        else:
+            print(f"❌ Password reset error: {response.status_code}")
+            print(f"   Response: {response.text[:200]}")
+            return False
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Password reset failed: {e}")
+        return False
+
+
+def password_reset_request(request):
+    """Request password reset OTP"""
+    
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        
+        if not email:
+            messages.error(request, '⚠️ กรุณากรอกอีเมล')
+            return render(request, 'a_users/password_reset_request.html')
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, '⚠️ ไม่พบอีเมลนี้ในระบบ')
+            return render(request, 'a_users/password_reset_request.html')
+        
+        # Rate limiting
+        rate_key = f"password_reset_rate_{email}"
+        if cache.get(rate_key):
+            messages.error(request, '⚠️ กรุณารอ 60 วินาทีก่อนขอรหัสใหม่')
+            return render(request, 'a_users/password_reset_request.html')
+        
+        # Generate OTP
+        code = str(random.randint(100000, 999999))
+        cache.set(f"password_reset_{email}", code, timeout=300)
+        cache.set(f"password_reset_attempts_{email}", 0, timeout=300)
+        cache.set(rate_key, True, 60)
+        
+        # Send OTP using Resend API
+        Thread(target=send_password_reset_email, args=(email, code)).start()
+        
+        # Store user ID in session
+        request.session['reset_user_id'] = user.id
+        
+        messages.success(request, '✅ ส่งรหัสยืนยันไปยังอีเมลของคุณแล้ว')
+        return redirect('a_users:password_reset_verify')
+    
+    return render(request, 'a_users/password_reset_request.html')
+
+
+def password_reset_verify(request):
+    """Verify OTP and reset password"""
+    
+    user_id = request.session.get('reset_user_id')
+    if not user_id:
+        messages.error(request, '⚠️ กรุณาขอรหัสยืนยันใหม่')
+        return redirect('a_users:password_reset_request')
+    
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, '⚠️ ไม่พบผู้ใช้')
+        return redirect('a_users:password_reset_request')
+    
+    if request.method == 'POST':
+        entered_code = request.POST.get('code', '').strip()
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        
+        if not new_password or len(new_password) < 6:
+            messages.error(request, '⚠️ รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร')
+            return render(request, 'a_users/password_reset_verify.html')
+        
+        if new_password != confirm_password:
+            messages.error(request, '⚠️ รหัสผ่านไม่ตรงกัน')
+            return render(request, 'a_users/password_reset_verify.html')
+        
+        email = user.email
+        stored_code = cache.get(f"password_reset_{email}")
+        attempts = cache.get(f"password_reset_attempts_{email}", 0)
+        
+        if not stored_code:
+            messages.error(request, '⚠️ รหัสหมดอายุหรือไม่ถูกต้อง')
+            return redirect('a_users:password_reset_request')
+        
+        if attempts >= 3:
+            messages.error(request, '⚠️ ผิดพลาดเกิน 3 ครั้ง')
+            cache.delete(f"password_reset_{email}")
+            return redirect('a_users:password_reset_request')
+        
+        if stored_code != entered_code:
+            cache.set(f"password_reset_attempts_{email}", attempts + 1, timeout=300)
+            remaining = 3 - (attempts + 1)
+            messages.error(request, f'⚠️ รหัสไม่ถูกต้อง เหลือโอกาส {remaining} ครั้ง')
+            return render(request, 'a_users/password_reset_verify.html')
+        
+        user.set_password(new_password)
+        user.save()
+        
+        cache.delete(f"password_reset_{email}")
+        cache.delete(f"password_reset_attempts_{email}")
+        del request.session['reset_user_id']
+        
+        messages.success(request, '✅ เปลี่ยนรหัสผ่านสำเร็จ! กรุณาเข้าสู่ระบบ')
+        return redirect('account_login')
+    
+    return render(request, 'a_users/password_reset_verify.html')
 
 
 # ============================================================================
@@ -158,7 +342,7 @@ def verification_code(request):
     cache.set(f"otp_attempts_{email}", 0, timeout=300)
     cache.set(rate_key, True, 60)  # Rate limit: 60 seconds
     
-    # Send email using Mailgun API (non-blocking)
+    # Send email using Resend API (non-blocking)
     Thread(target=send_otp_email, args=(email, code)).start()
     
     return HttpResponse("""
@@ -234,7 +418,7 @@ def signup_otp_view(request):
 
 
 # ============================================================================
-# Other Views (unchanged)
+# Other Views
 # ============================================================================
 
 def index_view(request):
