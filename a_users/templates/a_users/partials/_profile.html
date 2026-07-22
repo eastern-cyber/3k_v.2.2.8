@@ -22,7 +22,7 @@
                             Edit profile
                     </button>
                     <button @click="modalBox = true"
-                            hx-get="{% url 'settings' %}" 
+                            hx-get="{% url 'a_users:settings' %}" 
                             hx-target="#modalbox-content" 
                             hx-swap="innerHTML" 
                             class="bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md px-7 py-2">
