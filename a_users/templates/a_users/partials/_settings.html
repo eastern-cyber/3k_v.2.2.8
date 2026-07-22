@@ -13,7 +13,7 @@
         {% endif %}
     </div>
     <div class="w-18 md:!w-27 ml-auto">
-        <button hx-get="{% url 'settings' %}?email=true"
+        <button hx-get="{% url 'a_users:settings' %}?email=true"
                 hx-target="#email_block"
                 hx-swap="innerHTML"
                 class="font-medium text-blue-600 hover:underline">
@@ -34,7 +34,7 @@
     <div class="w-18 md:!w-27 ml-auto">
         {% if not user.emailaddress_set.first.verified %}
         <input type="hidden" name="email" value="{{ user.email }}">
-        <button hx-get="{% url 'verification_code' %}"
+        <button hx-get="{% url 'a_users:verification_code' %}"
                 hx-include="input[name='email']" 
                 hx-target="#verify-trigger"
                 hx-swap="none"
@@ -43,7 +43,7 @@
         </button>
         <div id="verify-trigger" class="hidden"
             hx-trigger="htmx:afterSwap" 
-            hx-get="{% url 'settings' %}?verification=true"
+            hx-get="{% url 'a_users:settings' %}?verification=true"
             hx-target="#verify_block"
             hx-swap="innerHTML">
         </div>
@@ -86,7 +86,7 @@
         <span>{{ user.birthday }}</span>
     </div>
     <div class="w-18 md:!w-27 ml-auto">
-        <button hx-get="{% url 'settings' %}?birthday=true"
+        <button hx-get="{% url 'a_users:settings' %}?birthday=true"
                 hx-target="#birthday_block"
                 hx-swap="innerHTML" 
                 class="font-medium text-blue-600 hover:underline">
@@ -101,7 +101,7 @@
         <span>Enable or disable email notifications</span>
     </div>
     <div class="w-18 md:!w-27 ml-auto">
-        <form hx-post="{% url 'settings' %}"
+        <form hx-post="{% url 'a_users:settings' %}"
             hx-trigger="change"
             hx-swap="none">
             {% csrf_token %}

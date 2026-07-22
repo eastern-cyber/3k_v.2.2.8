@@ -1,6 +1,6 @@
 <div class="w-32 font-medium text-md"></div>
 <div class="grow">
-    <form method="POST" action="{% url 'settings' %}" class="flex gap-2 md:pr-2 py-2 md:py-0">
+    <form method="POST" action="{% url 'a_users:settings' %}" class="flex gap-2 md:pr-2 py-2 md:py-0">
         {% csrf_token %}
         <input name="code" type="text" placeholder="Enter 6-digit code" class="input-field" >
         <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
@@ -10,7 +10,7 @@
     <p class="success pt-1">Verification code sent to your email!</p>
 </div>
 <div class="w-18 md:!w-27 ml-auto">
-    <a href="{% url 'settings' %}" class="font-medium text-neutral-400 hover:underline">
+    <a href="{% url 'a_users:settings' %}" class="font-medium text-neutral-400 hover:underline">
         Cancel
     </a>
 </div>
