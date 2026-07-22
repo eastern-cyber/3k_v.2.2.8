@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from allauth.account.views import PasswordChangeView
 from a_posts.views import *
-from a_users.views import profile_view, index_view, signup_otp_view  # Add this import
+from a_users.views import profile_view, index_view, signup_otp_view, settings_view  # Add settings_view
 
 urlpatterns = [
     path('', home_view, name="home"),
@@ -27,6 +27,9 @@ urlpatterns = [
     path('search/', include("a_search.urls")),
     path('notifications/', include("a_notifications.urls")),
     path('messages/', include("a_messages.urls")),
+    
+    # Add fallback settings URL (for backward compatibility)
+    path('settings/', settings_view, name='settings'),
 ]
 
 if settings.DEBUG:
