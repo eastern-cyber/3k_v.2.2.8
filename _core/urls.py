@@ -22,7 +22,7 @@ urlpatterns = [
     path('explore/', explore_view, name="explore"),
     path('upload/', upload_view, name="upload"),
     path('post/', include("a_posts.urls")),
-    path('profile/', include("a_users.urls")),
+    path('profile/', include('a_users.urls', namespace='a_users')),
     path('following/', include("a_network.urls")),
     path('search/', include("a_search.urls")),
     path('notifications/', include("a_notifications.urls")),

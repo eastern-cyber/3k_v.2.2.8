@@ -30,7 +30,7 @@
                     </a>
                 </div>
             </div>
-            <a href="{% url 'account_reset_password' %}" class="inline-block align-top text-xs font-medium text-neutral-500 hover:underline hover:text-black mb-6">
+            <a href="{% url 'a_users:password_reset_request' %}" class="inline-block align-top text-xs font-medium text-neutral-500 hover:underline hover:text-black mb-6">
                 ลืมรหัสผ่าน?
             </a>
             <button x-bind:type="buttonActive ? 'submit' : 'button'" class="button" x-bind:class="{ 'button-active': buttonActive }">ล็อกอิน</button>
