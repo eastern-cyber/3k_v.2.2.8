@@ -410,7 +410,10 @@ def signup_otp_view(request):
             
             messages.success(request, '🎉 ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่ KokKokKok')
             
-            return redirect(request.GET.get('next', '/'))
+            next_url = request.GET.get('next', '/')
+            if not next_url:
+                next_url = '/'
+            return redirect(next_url)
     else:
         form = SignupForm()
     
