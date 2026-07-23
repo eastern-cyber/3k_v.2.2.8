@@ -4,7 +4,7 @@
     </p>
 </div>
 
-<form method="POST" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
+<form method="POST" action="{% url 'a_users:profile_edit' %}" enctype="multipart/form-data">
 {% csrf_token %}
 
 <div class="flex border-b border-neutral-200 py-4">
