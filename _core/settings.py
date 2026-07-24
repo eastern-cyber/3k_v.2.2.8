@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # <-- Add this
+
     
     # My apps
     'a_posts',
@@ -82,6 +84,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
 ]
+
+# Add Site ID
+SITE_ID = 1
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
