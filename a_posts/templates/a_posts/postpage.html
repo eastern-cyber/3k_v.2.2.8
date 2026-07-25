@@ -2,14 +2,25 @@
 {% load static %}
 
 {% block meta_tags %}
+{% if post and post.author %}
 <meta property="og:title" content="Post by {{ post.author.username }}">
 <meta property="og:description" content="Check out this post!">
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% endif %}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/og-image.png' %}{% endif %}">
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Post by {{ post.author.username }}">
 <meta name="twitter:description" content="Check out this post!">
-<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% endif %}">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/og-image.png' %}{% endif %}">
+{% else %}
+<meta property="og:title" content="KokKokKok">
+<meta property="og:description" content="Share and discover posts!">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-image.png' %}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KokKokKok">
+<meta name="twitter:description" content="Share and discover posts!">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-image.png' %}">
+{% endif %}
 {% endblock %}
 
 {% block content %}
