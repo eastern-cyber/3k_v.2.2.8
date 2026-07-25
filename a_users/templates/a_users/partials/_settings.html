@@ -1,11 +1,11 @@
 <div class="border-b border-neutral-200 pb-4">
     <p class="font-medium text-2xl">
-        Settings
+        ตั้งค่า
     </p>
 </div>
 
 <div id="email_block" class="md:flex gap-2 pt-4">
-    <div class="w-32 font-medium text-md">Email address</div>
+    <div class="w-32 font-medium text-md">อีเมล</div>
     <div class="grow">
         <span>{{ user.email }}</span>
         {% if form.email.errors %}
@@ -17,7 +17,7 @@
                 hx-target="#email_block"
                 hx-swap="innerHTML"
                 class="font-medium text-blue-600 hover:underline">
-                Change
+                เปลี่ยน
         </button>
     </div>
 </div>
@@ -26,9 +26,9 @@
     <div class="w-32 font-medium text-md"></div>
     <div class="grow">
         {% if user.emailaddress_set.first.verified %}
-        <span class="text-green-500">Verified</span>
+        <span class="text-green-500">ผ่านการยืนยันแล้ว</span>
         {% else %}
-        <span class="text-amber-500">Not verified</span>
+        <span class="text-amber-500">ยังไม่ผ่านการยืนยัน</span>
         {% endif %}
     </div>
     <div class="w-18 md:!w-27 ml-auto">
@@ -39,7 +39,7 @@
                 hx-target="#verify-trigger"
                 hx-swap="none"
                 class="font-medium text-blue-600 hover:underline">
-                Verify
+                ทำการยืนยัน
         </button>
         <div id="verify-trigger" class="hidden"
             hx-trigger="htmx:afterSwap" 
@@ -52,7 +52,7 @@
 </div>
 
 <div id="password_reset_block" class="md:flex gap-2 py-4 border-b border-neutral-200">
-    <div class="w-32 font-medium text-md">Password</div>
+    <div class="w-32 font-medium text-md">รหัสผ่าน</div>
     <div class="grow">
         {% if messages %}
         {% for message in messages %}
@@ -64,24 +64,24 @@
                     </span>
                 </template>
                 <template x-if="!message.includes('Password')">
-                    <span>Change Password</span>
+                    <span>เปลี่ยนรหัสผ่าน</span>
                 </template>
             </div>
             {% endif %}
         {% endfor %}
         {% else %}
-        <span>Change Password</span>
+        <span>เปลี่ยนรหัสผ่าน</span>
         {% endif %}
     </div>
     <div class="w-18 md:!w-27 ml-auto">
         <a href="{% url 'account_change_password' %}" class="font-medium text-blue-600 hover:underline">
-            Change
+            เปลี่ยน
         </a>
     </div>
 </div>
 
 <div id="birthday_block" class="md:flex gap-2 py-4 border-b border-neutral-200">
-    <div class="w-32 font-medium text-md">Birthday</div>
+    <div class="w-32 font-medium text-md">วันเกิด</div>
     <div class="grow">
         <span>{{ user.birthday }}</span>
     </div>
@@ -90,15 +90,15 @@
                 hx-target="#birthday_block"
                 hx-swap="innerHTML" 
                 class="font-medium text-blue-600 hover:underline">
-                Change
+                เปลี่ยน
         </button>
     </div>
 </div>
 
 <div id="notifications_block" class="md:flex gap-2 py-4 border-b border-neutral-200">
-    <div class="w-32 font-medium text-md">Notifications</div>
+    <div class="w-32 font-medium text-md">การแจ้งเตือน</div>
     <div class="grow">
-        <span>Enable or disable email notifications</span>
+        <span>เปิด/ปิด ข้อความแจ้งเตือน</span>
     </div>
     <div class="w-18 md:!w-27 ml-auto">
         <form hx-post="{% url 'a_users:settings' %}"
@@ -116,11 +116,11 @@
 </div>
 
 <div id="account_delete_block" class="md:flex gap-2 py-4">
-    <div class="w-32 font-medium text-md">Account</div>
+    <div class="w-32 font-medium text-md">บัญชีผู้ใช้</div>
     <div class="grow">
-        <span>Once deleted, account is gone. Forever.</span>
+        <span>หากกดปุ่ม "ลบบัญชี" บัญชีของท่านจะถูกลบถาวร</span>
     </div>
     <div class="w-18 md:!w-27 ml-auto">
-        <a href="{% url 'delete_account' %}" class="font-medium text-red-600 hover:underline">Delete</a>
+        <a href="{% url 'a_users:delete_account' %}" class="font-medium text-red-600 hover:underline">ลบบัญชี</a>
     </div>
 </div>

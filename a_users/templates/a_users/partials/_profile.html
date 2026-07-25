@@ -19,7 +19,7 @@
                             hx-target="#modalbox-content" 
                             hx-swap="innerHTML" 
                             class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
-                            Edit profile
+                            แก้ไขโพรไฟล์
                     </button>
                     <button @click="modalBox = true"
                             hx-get="{% url 'a_users:settings' %}" 
@@ -44,7 +44,7 @@
                             hx-swap="innerHTML transition:true"
                             hx-push-url="{% url 'messages' %}"
                             class="bg-neutral-200/70 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md px-7 py-2">
-                            Message
+                            ส่งข้อความ
                     </button>
                     {% endif %}
                     <button @click="modalBox = true"
@@ -67,7 +67,7 @@
                             <span id="following_count_{{ profile_user.username }}" class="font-bold mr-1 tabular-nums">
                                 {{ profile_user.is_follower.count }}
                             </span>
-                            Following
+                            การติดตาม
                     </button>
                     <button @click="modalBox = true" class="hover:underline"
                             hx-get="{% url 'profile' profile_user.username %}?followers=true"
@@ -76,13 +76,13 @@
                             <span id="followers_count_{{ profile_user.username }}" class="font-bold mr-1 tabular-nums">
                                 {{ profile_user.is_followed.count }}
                             </span>
-                            Followers
+                            ผู้ติดตาม
                     </button>
                     <div>
                         <span id="post_user_likes" class="font-bold mr-1">
                             {{ profile_user_likes }}
                         </span>
-                        Likes
+                        ผู้ชื่นชอบ
                     </div>
                 </div>
                 {% if profile_user.bio %}
@@ -114,7 +114,7 @@
                                     <path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                 </svg>
                             </div>
-                            <span class="hidden sm:block">Posts</span>
+                            <span class="hidden sm:block">โพสต์</span>
                         </div>
                     </button>
                     <button @click="selectedTab = 'reposts'"
@@ -128,7 +128,7 @@
                                         <path d="M37.7 15v19.7l3.48-3.7a.7.7 0 0 1 .99-.03l1.46 1.37c.28.26.3.7.03.99l-6.26 6.66a2.3 2.3 0 0 1-3.34.01l-6.36-6.66a.7.7 0 0 1 .02-.99l1.45-1.38a.7.7 0 0 1 .99.02l4.14 4.34V15a4.3 4.3 0 0 0-4.3-4.3h-3.5a.7.7 0 0 1-.7-.7V8c0-.39.31-.7.7-.7H30a7.7 7.7 0 0 1 7.7 7.7ZM17.84 17.34 13.7 13v20a4.3 4.3 0 0 0 4.3 4.3h3.5c.39 0 .7.31.7.7v2a.7.7 0 0 1-.7.7H18a7.7 7.7 0 0 1-7.7-7.7V13.63l-3.48 3.7a.7.7 0 0 1-.99.03L4.37 16a.7.7 0 0 1-.03-.98l6.26-6.67a2.3 2.3 0 0 1 3.34-.01l6.36 6.66a.7.7 0 0 1-.02.99l-1.45 1.38a.7.7 0 0 1-.99-.02Z"></path>
                                     </svg>
                                 </div>
-                                <span class="hidden sm:block">Reposts</span>
+                                <span class="hidden sm:block">รีโพสต์</span>
                             </div>
                     </button>
                     {% if user == profile_user %}
@@ -142,7 +142,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                                     </svg>
                                 </div>
-                                <span class="hidden sm:block">Favorites</span>
+                                <span class="hidden sm:block">ที่บันทึกไว้</span>
                             </div>
                     </button>
                     {% endif %}
@@ -157,7 +157,7 @@
                                         <path d="M12 2.5L14.5 8.5L21 9.2L16 14L17.5 20.5L12 17L6.5 20.5L8 14L3 9.2L9.5 8.5L12 2.5Z"/>
                                     </svg>
                                 </div>
-                                <span class="hidden sm:block">Liked</span>
+                                <span class="hidden sm:block">ที่ชื่นชอบ</span>
                             </div>
                     </button>
                 </div>
@@ -168,21 +168,21 @@
                                 hx-target="#posts-container" 
                                 hx-swap="innerHTML"
                                 class="px-3 py-2 rounded-sm" :class="selectedFilter === 'latest' ? 'bg-white dark:bg-neutral-600' : 'text-neutral-500'">
-                                Latest
+                                ล่าสุด
                         </button>
                         <button @click="selectedFilter = 'popular'"
                                 hx-get="{% url 'profile' profile_user.username %}?sort=popular" 
                                 hx-target="#posts-container" 
                                 hx-swap="innerHTML"
                                 class="px-3 py-2 rounded-sm" :class="selectedFilter === 'popular' ? 'bg-white dark:bg-neutral-600' : 'text-neutral-500'">
-                                Popular
+                                ยอดนิยม
                         </button>
                         <button @click="selectedFilter = 'oldest'" 
                                 hx-get="{% url 'profile' profile_user.username %}?sort=oldest" 
                                 hx-target="#posts-container" 
                                 hx-swap="innerHTML"
                                 class="px-3 py-2 rounded-sm" :class="selectedFilter === 'oldest' ? 'bg-white dark:bg-neutral-600' : 'text-neutral-500'">
-                                Oldest
+                                เก่าสุด
                         </button>
                     </div>
                 </div>
@@ -195,9 +195,9 @@
                     </div>
                     {% else %}
                     <div class="text-center pt-32">
-                        <div class="font-bold text-2xl">No Posts yet</div>
+                        <div class="font-bold text-2xl">ยังไม่มีการโพสต์</div>
                         {% if profile_user == user %}
-                        <div class="mt-2">Your posts will appear here</div>
+                        <div class="mt-2">โพสต์ของท่านจะปรากฏตรงนี้</div>
                         {% endif %}
                     </div>
                     {% endif %}
