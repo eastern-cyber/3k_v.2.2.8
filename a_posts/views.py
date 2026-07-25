@@ -9,6 +9,21 @@ from .forms import PostForm, PostEditForm
 from .models import Post, Comment, Repost, Tag
 from .utils import process_tags
 
+def post_detail_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    # Check if user is authenticated before accessing user properties
+    if request.user.is_authenticated:
+        user_id = request.user.id
+        # Your other logic here
+    else:
+        user_id = None
+    
+    context = {
+        'post': post,
+        'user_id': user_id,
+    }
+    return render(request, 'a_posts/post_detail.html', context)
 
 @login_required
 def home_view(request):
@@ -110,7 +125,11 @@ def post_page_view(request, pk=None):
     
     post = get_object_or_404(Post, uuid=pk)
     
-    if request.method == "POST": 
+    # Handle POST requests - only for authenticated users
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
         body = request.POST.get('comment')
         if body:
             Comment.objects.create(
@@ -118,26 +137,34 @@ def post_page_view(request, pk=None):
                 post=post,
                 body=body
             )
-            context = {
-                'post': post
-            }
+            context = {'post': post}
             return render(request, 'a_posts/partials/comments/_comment_loop.html', context)
     
-    if post.author:
-        author_posts = list(Post.objects.filter(author=post.author).order_by('-created_at'))
-        index = author_posts.index(post)
-        prev_post = author_posts[index - 1] if index > 0 else None
-        next_post = author_posts[index + 1] if index < len(author_posts) - 1 else None
-    else:
-        author_posts = [ post ] 
-        prev_post = next_post = None
+    # Handle author posts with proper null checking
+    author_posts = [post]
+    prev_post = None
+    next_post = None
+    
+    # Only try to get author posts if the post has an author
+    if post.author and post.author.is_authenticated:
+        try:
+            author_posts = list(Post.objects.filter(author=post.author).order_by('-created_at'))
+            if len(author_posts) > 1:
+                index = author_posts.index(post)
+                prev_post = author_posts[index - 1] if index > 0 else None
+                next_post = author_posts[index + 1] if index < len(author_posts) - 1 else None
+        except (ValueError, AttributeError):
+            # Fallback to just the current post
+            author_posts = [post]
     
     context = {
-        'post' : post,
-        'author_posts' : author_posts,
+        'post': post,
+        'author_posts': author_posts,
         'prev_post': prev_post,
         'next_post': next_post,
+        'user_authenticated': request.user.is_authenticated,
     }
+    
     if request.htmx:
         return render(request, 'a_posts/partials/_postpage.html', context)
     return render(request, 'a_posts/postpage.html', context)
