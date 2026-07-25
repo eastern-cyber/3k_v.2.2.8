@@ -125,6 +125,13 @@ def post_page_view(request, pk=None):
     
     post = get_object_or_404(Post, uuid=pk)
     
+    # Check if this is a crawler/bot
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    is_crawler = any(bot in user_agent.lower() for bot in [
+        'facebook', 'twitter', 'linkedin', 'bot', 'crawler', 
+        'facebookexternalhit', 'facebot', 'twitterbot'
+    ])
+    
     # Handle POST requests - only for authenticated users
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -139,6 +146,15 @@ def post_page_view(request, pk=None):
             )
             context = {'post': post}
             return render(request, 'a_posts/partials/comments/_comment_loop.html', context)
+    
+    # For crawlers, return a minimal version with just the post data and meta tags
+    if is_crawler:
+        context = {
+            'post': post,
+            'user_authenticated': False,
+            'is_crawler': True,
+        }
+        return render(request, 'a_posts/postpage.html', context)
     
     # Handle author posts with proper null checking
     author_posts = [post]
@@ -163,6 +179,7 @@ def post_page_view(request, pk=None):
         'prev_post': prev_post,
         'next_post': next_post,
         'user_authenticated': request.user.is_authenticated,
+        'is_crawler': False,
     }
     
     if request.htmx:

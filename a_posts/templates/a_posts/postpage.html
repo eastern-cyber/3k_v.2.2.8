@@ -4,12 +4,13 @@
 {% block meta_tags %}
 {% if post and post.author %}
 <meta property="og:title" content="Post by {{ post.author.username }}">
-<meta property="og:description" content="Check out this post!">
+<meta property="og:description" content="{% if post.body %}{{ post.body|truncatechars:200 }}{% else %}Check out this post!{% endif %}">
 <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/og-image.png' %}{% endif %}">
 <meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Post by {{ post.author.username }}">
-<meta name="twitter:description" content="Check out this post!">
+<meta name="twitter:description" content="{% if post.body %}{{ post.body|truncatechars:200 }}{% else %}Check out this post!{% endif %}">
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/og-image.png' %}{% endif %}">
 {% else %}
 <meta property="og:title" content="KokKokKok">
@@ -24,8 +25,28 @@
 {% endblock %}
 
 {% block content %}
-<a href="/" class="absolute z-100 left-5 top-5 rounded-full size-10 hover:bg-rose-500 flex items-center justify-center transition duration-300">
-    <img src="{% static 'images/icon_dark.png' %}">
-</a>
-{% include "a_posts/partials/_postpage.html" %}
+{% if is_crawler %}
+    <!-- Simplified content for crawlers -->
+    <div class="max-w-2xl mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post image" class="w-full">
+            {% endif %}
+            <div class="p-6">
+                <h1 class="text-2xl font-bold mb-2">Post by {{ post.author.username }}</h1>
+                {% if post.body %}
+                <p class="text-gray-700">{{ post.body }}</p>
+                {% endif %}
+                <div class="mt-4 text-sm text-gray-500">
+                    Posted {{ post.created_at|timesince }} ago
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <a href="/" class="absolute z-100 left-5 top-5 rounded-full size-10 hover:bg-rose-500 flex items-center justify-center transition duration-300">
+        <img src="{% static 'images/icon_dark.png' %}">
+    </a>
+    {% include "a_posts/partials/_postpage.html" %}
+{% endif %}
 {% endblock %}
