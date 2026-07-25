@@ -7,6 +7,7 @@ from a_posts.views import *
 from a_users.views import profile_view, index_view, signup_otp_view, settings_view  # Add settings_view
 
 urlpatterns = [
+    path('', include('a_pages.urls')),  # Add this line
     path('', home_view, name="home"),
     path('admin/', admin.site.urls),
     path("accounts/password/change/", PasswordChangeView.as_view(success_url=reverse_lazy("settings")), name="account_change_password"),

@@ -16,6 +16,7 @@ dependencies = [
     "django-htmx==1.23.1",
     "django-resized==1.0.3",
     "gunicorn==26.0.0",
+    "opencv-python>=5.0.0.93",
     "pillow==11.3.0",
     "psycopg2-binary==2.9.11",
     "requests==2.32.5",
