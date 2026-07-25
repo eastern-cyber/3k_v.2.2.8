@@ -26,9 +26,9 @@
     <div class="w-32 font-medium text-md"></div>
     <div class="grow">
         {% if user.emailaddress_set.first.verified %}
-        <span class="text-green-500">ผ่านการยืนยันแล้ว</span>
+        <span class="text-green-500">Verified</span>
         {% else %}
-        <span class="text-amber-500">ยังไม่ผ่านการยืนยัน</span>
+        <span class="text-amber-500">Not Verified</span>
         {% endif %}
     </div>
     <div class="w-18 md:!w-27 ml-auto">
@@ -39,7 +39,7 @@
                 hx-target="#verify-trigger"
                 hx-swap="none"
                 class="font-medium text-blue-600 hover:underline">
-                ทำการยืนยัน
+                Verify
         </button>
         <div id="verify-trigger" class="hidden"
             hx-trigger="htmx:afterSwap" 
@@ -98,7 +98,7 @@
 <div id="notifications_block" class="md:flex gap-2 py-4 border-b border-neutral-200">
     <div class="w-32 font-medium text-md">การแจ้งเตือน</div>
     <div class="grow">
-        <span>เปิด/ปิด ข้อความแจ้งเตือน</span>
+        <span>ข้อความแจ้งเตือน</span>
     </div>
     <div class="w-18 md:!w-27 ml-auto">
         <form hx-post="{% url 'a_users:settings' %}"
