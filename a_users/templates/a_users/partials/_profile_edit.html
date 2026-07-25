@@ -1,6 +1,6 @@
 <div class="border-b border-neutral-200 pb-4">
     <p class="font-medium text-2xl">
-        Edit profile
+        แก้ไขโพรไฟล์
     </p>
 </div>
 
@@ -8,7 +8,7 @@
 {% csrf_token %}
 
 <div class="flex border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md">Profile photo</div>
+    <div class="w-30 font-medium text-md">รูปโพรไฟล์</div>
     <div class="grow flex justify-center">
         <div x-data class="inline-block relative">
             <img id="avatar" class="h-32 w-32 rounded-full object-cover" src="{{ user.avatar }}" />
@@ -29,25 +29,25 @@
 </div>
 
 <div class="flex items-center border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md">Username</div>
+    <div class="w-30 font-medium text-md">ชื่อผู้ใช้</div>
     <div class="grow">{{ form.username }}</div>
     <div class="w-0 sm:w-27"></div>
 </div>
 
 <div class="flex items-center border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md">Name</div>
+    <div class="w-30 font-medium text-md">ชื่อแสดง</div>
     <div class="grow">{{ form.name }}</div>
     <div class="w-0 sm:w-27"></div>
 </div>
 
 <div class="flex border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md shrink-0">Bio</div>
+    <div class="w-30 font-medium text-md shrink-0">รายละเอียด</div>
     <div class="grow">{{ form.bio }}</div>
     <div class="w-0 sm:w-27 shrink-0"></div>
 </div>
 
 <div class="flex items-center border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md">Website</div>
+    <div class="w-30 font-medium text-md">ลิ้งค์แนะนำ</div>
     <div class="grow">{{ form.website }}</div>
     <div class="w-0 sm:w-27"></div>
 </div>
@@ -57,11 +57,11 @@
         <button type="button"
                 @click="modalBox = false; document.getElementById('modalbox-content').innerHTML = ''; "
                 class="bg-white hover:bg-neutral-100 border border-neutral-300 rounded-md px-7 py-2">
-                Cancel
+                ยกเลิก
         </button>
         <button type="submit" 
                 class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
-                Save
+                บันทึก
         </button>
     </div>
 </div>
