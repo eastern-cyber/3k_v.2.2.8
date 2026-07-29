@@ -262,12 +262,11 @@
                 <p class="font-bold text-xs dark:text-white text-black px-2 py-0.5 inline-block rounded-2xl dark:bg-neutral-700 bg-neutral-200 opacity-70">
                     {% with count=post.comments.count %}
                         {% if count >= 1000 %}
-                            {{ count|floatformat:0|divisibleby:1000|yesno:"1, " }}
-                            {% widthratio count 1000 1 as thousands %}
                             {% if count < 10000 %}
-                                {{ count|floatformat:"1"|slice:":-4" }}K
+                                {{ count|floatformat:"1"|cut:".0"|add:"0"|floatformat:"1" }}K
+                                {# This won't work well either - use custom filter instead #}
                             {% else %}
-                                {{ count|floatformat:"0"|slice:":-4" }}K
+                                {{ count|floatformat:"0"|slice:":-3" }}K
                             {% endif %}
                         {% else %}
                             {{ count }}
