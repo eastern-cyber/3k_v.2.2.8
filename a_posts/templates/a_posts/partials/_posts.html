@@ -263,8 +263,7 @@
                     {% with count=post.comments.count %}
                         {% if count >= 1000 %}
                             {% if count < 10000 %}
-                                {{ count|floatformat:"1"|cut:".0"|add:"0"|floatformat:"1" }}K
-                                {# This won't work well either - use custom filter instead #}
+                                {{ count|floatformat:"1"|slice:":-5" }}.{{ count|floatformat:"1"|slice:"-5:-4" }}K
                             {% else %}
                                 {{ count|floatformat:"0"|slice:":-3" }}K
                             {% endif %}
