@@ -32,5 +32,87 @@
 {% block layout %}
 {% endblock %}
 
+<script>
+(function() {
+    'use strict';
+    
+    let currentVideo = null;
+    let userInteracted = false;
+    let listenersAttached = false;
+    
+    function unmuteVideo(video) {
+        if (!video) return;
+        video.muted = false;
+        video.volume = 1.0;
+        if (video.paused) {
+            video.play().catch(() => {});
+        }
+    }
+    
+    function attachInteractionListeners() {
+        if (listenersAttached) return;
+        listenersAttached = true;
+        
+        const handler = () => {
+            userInteracted = true;
+            const video = document.querySelector('video[data-main-video]');
+            if (video && video.muted) {
+                unmuteVideo(video);
+            }
+        };
+        
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, handler, { once: true, passive: true });
+        });
+    }
+    
+    function managePostVideo() {
+        // 1. Mute ALL videos on the page (grid thumbnails, old posts, etc.)
+        document.querySelectorAll('video').forEach(v => v.muted = true);
+        
+        // 2. Find the main active video
+        const video = document.querySelector('video[data-main-video]');
+        if (!video) {
+            currentVideo = null;
+            return;
+        }
+        
+        // 3. Already handling this exact element? Skip.
+        if (video === currentVideo) return;
+        currentVideo = video;
+        
+        // 4. If user unmutes via native controls, mute every other video immediately
+        video.addEventListener('volumechange', function() {
+            if (!video.muted) {
+                document.querySelectorAll('video').forEach(v => {
+                    if (v !== video) v.muted = true;
+                });
+            }
+        });
+        
+        // 5. Unmute the active video
+        if (userInteracted) {
+            // User has already interacted — unmute freely
+            unmuteVideo(video);
+        } else {
+            // Try to unmute immediately (may be blocked by browser)
+            unmuteVideo(video);
+            // Set up one-time listener for first interaction
+            attachInteractionListeners();
+        }
+    }
+    
+    // Run on initial page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', managePostVideo);
+    } else {
+        managePostVideo();
+    }
+    
+    // Run after HTMX swaps (prev/next post navigation)
+    document.body.addEventListener('htmx:afterSettle', managePostVideo);
+})();
+</script>
+
 </body>
 </html>

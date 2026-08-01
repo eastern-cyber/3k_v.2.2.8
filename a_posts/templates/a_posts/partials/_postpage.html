@@ -3,14 +3,13 @@
     <!-- Main content (media) area -->
     <div class="relative bg-black flex items-center justify-center w-full lg:w-1/2 h-[50vh] lg:h-full flex-shrink-0">
         {% if post.video %}
-            <video id="main-video-{{ post.uuid }}" 
-                   src="{{ post.video.url }}" 
-                   class="object-contain w-full h-full" 
-                   controls 
-                   autoplay 
-                   muted 
-                   loop 
-                   playsinline></video>
+            <video 
+                id="main-video-{{ post.uuid }}"
+                data-main-video
+                src="{{ post.video.url }}"
+                class="object-contain w-full h-full"
+                controls autoplay muted loop playsinline>
+            </video>
         {% elif post.image %}
             <img src="{{ post.image.url }}" class="object-contain w-full h-full">
         {% endif %}
@@ -224,93 +223,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Function to handle video audio management
-    function manageVideoAudio() {
-        const videos = document.querySelectorAll('video');
-        let activeVideo = null;
-        
-        // Function to unmute the current active video
-        function unmuteActiveVideo() {
-            if (activeVideo) {
-                activeVideo.muted = false;
-                activeVideo.volume = 1.0;
-            }
-        }
-        
-        // Function to mute all inactive videos
-        function muteInactiveVideos() {
-            videos.forEach(video => {
-                if (video !== activeVideo) {
-                    video.muted = true;
-                }
-            });
-        }
-        
-        // Set the main video as active and unmute it
-        const mainVideo = document.getElementById('main-video-{{ post.uuid }}');
-        if (mainVideo) {
-            activeVideo = mainVideo;
-            unmuteActiveVideo();
-            
-            // Add click event to toggle mute
-            mainVideo.addEventListener('click', function(e) {
-                // Don't interfere with video controls
-                if (e.target === mainVideo) {
-                    if (mainVideo.muted) {
-                        mainVideo.muted = false;
-                        mainVideo.volume = 1.0;
-                    } else {
-                        mainVideo.muted = true;
-                    }
-                }
-            });
-            
-            // Ensure video starts playing with sound
-            mainVideo.play().then(() => {
-                mainVideo.muted = false;
-                mainVideo.volume = 1.0;
-            }).catch(error => {
-                console.log('Autoplay with sound was prevented:', error);
-                // Add a play button or user interaction prompt
-                const playPrompt = document.createElement('div');
-                playPrompt.className = 'absolute inset-0 flex items-center justify-center cursor-pointer';
-                playPrompt.innerHTML = `
-                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 hover:bg-white/30 transition-all">
-                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </div>
-                `;
-                playPrompt.onclick = () => {
-                    mainVideo.muted = false;
-                    mainVideo.volume = 1.0;
-                    mainVideo.play();
-                    playPrompt.remove();
-                };
-                mainVideo.parentElement.appendChild(playPrompt);
-            });
-        }
-        
-        // Mute any other videos on the page
-        muteInactiveVideos();
-        
-        // Handle video navigation (when navigating between posts)
-        document.addEventListener('htmx:afterSwap', function(evt) {
-            if (evt.detail.target.id === 'postpage-content') {
-                manageVideoAudio();
-            }
-        });
-    }
-    
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', manageVideoAudio);
-    
-    // Initialize for HTMX loaded content
-    document.addEventListener('htmx:load', function(evt) {
-        if (evt.detail.elt.id === 'postpage-content') {
-            manageVideoAudio();
-        }
-    });
-</script>
