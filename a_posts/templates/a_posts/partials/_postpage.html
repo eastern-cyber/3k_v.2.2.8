@@ -1,12 +1,20 @@
 {% load static %}
-<div id="postpage-content" class="grid lg:grid-cols-[1fr_540px] h-screen">
-    <div class="relative bg-black flex items-center justify-center">
+<div id="postpage-content" class="flex flex-col lg:flex-row h-screen overflow-hidden">
+    <!-- Main content (media) area -->
+    <div class="relative bg-black flex items-center justify-center w-full lg:w-1/2 h-[50vh] lg:h-full flex-shrink-0">
         {% if post.video %}
-            <video src="{{ post.video.url }}" class="object-contain w-full h-screen" controls autoplay muted loop playsinline></video>
+            <video id="main-video-{{ post.uuid }}" 
+                   src="{{ post.video.url }}" 
+                   class="object-contain w-full h-full" 
+                   controls 
+                   autoplay 
+                   muted 
+                   loop 
+                   playsinline></video>
         {% elif post.image %}
-            <img src="{{ post.image.url }}" class="object-contain max-h-screen">
+            <img src="{{ post.image.url }}" class="object-contain w-full h-full">
         {% endif %}
-        <scroll-bar class="absolute right-5 top-0 h-full flex items-center">
+        <scroll-bar class="absolute right-5 top-0 h-full flex items-center z-10">
             <div class="flex flex-col gap-4">
                 {% if prev_post %}
                 <button hx-get="{% url 'post_page' prev_post.uuid %}"
@@ -41,9 +49,11 @@
             </div>
         </scroll-bar>
     </div>
-    <div class="hidden lg:block">
-        <div class="flex flex-col gap-5 h-screen bg-white dark:bg-black">
-            <article-info class="block mx-4 mt-4">
+
+    <!-- Right panel - Always visible -->
+    <div class="w-full lg:w-[540px] lg:flex-shrink-0 bg-white dark:bg-black h-[50vh] lg:h-screen flex flex-col overflow-hidden">
+        <div class="flex flex-col gap-4 h-full overflow-y-auto">
+            <article-info class="block mx-4 mt-4 flex-shrink-0">
                 <div class="bg-neutral-100 dark:bg-neutral-900 rounded-xl p-4">
                     {% if post.author %}
                     <div class="flex items-center justify-between">
@@ -95,8 +105,8 @@
                     {% endif %}
                 </div>
             </article-info>
-            <article-buttons class="mx-8 flex items-center gap-4">
-                
+            
+            <article-buttons class="mx-8 flex items-center gap-4 flex-wrap flex-shrink-0">
                 {% include 'a_posts/partials/_like_postpage.html' %}
 
                 <button id="comments" class="flex items-center gap-1">
@@ -151,29 +161,31 @@
                         </div>
                 </button>
             </article-buttons>
-            <article-url x-data="{ copyLink() { navigator.clipboard.writeText($refs.urlLink.innerText); } }" class="mx-8 flex items-center bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm">
+            
+            <article-url x-data="{ copyLink() { navigator.clipboard.writeText($refs.urlLink.innerText); } }" class="mx-8 flex items-center bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm flex-shrink-0">
                 <span x-ref="urlLink" class="grow px-4 py-2 text-neutral-500 dark:text-neutral-400 truncate">
                     {{ request.scheme }}://{{ request.get_host }}{% url 'post_page' post.uuid %}
                 </span>
                 <button @click="copyLink" class="shrink-0 px-4 py-2 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-900 active:bg-neutral-200 dark:active:bg-black transition-colors">
-                    Copy link
+                    ก๊อปปี้ลิ้งค์
                 </button>
             </article-url>
-            <article-comments x-data="{ selectedTab: 'comments' }" class="relative grow mt-2 overflow-hidden flex flex-col">
-                <div class="grid grid-cols-2 px-8 text-sm text-center font-medium border-b border-neutral-300 dark:border-neutral-800">
+            
+            <article-comments x-data="{ selectedTab: 'comments' }" class="relative flex-1 overflow-hidden flex flex-col min-h-0">
+                <div class="grid grid-cols-2 px-8 text-sm text-center font-medium border-b border-neutral-300 dark:border-neutral-800 flex-shrink-0">
                     <button @click="selectedTab = 'comments'" class="border-b-2 pb-2" :class="selectedTab === 'comments' ? 'border-black dark:border-white' : 'text-neutral-400 border-transparent'">
-                        Comments (<span id='comment_count'>{{ post.comments.count }}</span>)
+                        คอมเม้นท์ (<span id='comment_count'>{{ post.comments.count }}</span>)
                     </button>
                     <button @click="selectedTab = 'posts'" class="border-b-2 pb-2" :class="selectedTab === 'posts' ? 'border-black dark:border-white' : 'text-neutral-400 border-transparent'">
-                        Creator posts
+                        โพสต์ของผู้ใช้ท่านนี้
                     </button>
                 </div>
-                <div x-show="selectedTab === 'comments'" class="px-8 py-6 overflow-y-auto hide-scrollbar mb-24">
+                <div x-show="selectedTab === 'comments'" class="px-8 py-6 overflow-y-auto hide-scrollbar flex-1">
                     <div id="comments_container" class="flex flex-col gap-6">
                         {% include "a_posts/partials/comments/_comment_loop.html" %}
                     </div>
                 </div>
-                <div x-show="selectedTab === 'posts'" x-cloak class="px-8 py-6 overflow-y-auto hide-scrollbar">
+                <div x-show="selectedTab === 'posts'" x-cloak class="px-8 py-6 overflow-y-auto hide-scrollbar flex-1">
                     <div class="grid gap-2 grid-cols-3">
                         {% for post_item in author_posts %}
                         <article>
@@ -212,3 +224,93 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Function to handle video audio management
+    function manageVideoAudio() {
+        const videos = document.querySelectorAll('video');
+        let activeVideo = null;
+        
+        // Function to unmute the current active video
+        function unmuteActiveVideo() {
+            if (activeVideo) {
+                activeVideo.muted = false;
+                activeVideo.volume = 1.0;
+            }
+        }
+        
+        // Function to mute all inactive videos
+        function muteInactiveVideos() {
+            videos.forEach(video => {
+                if (video !== activeVideo) {
+                    video.muted = true;
+                }
+            });
+        }
+        
+        // Set the main video as active and unmute it
+        const mainVideo = document.getElementById('main-video-{{ post.uuid }}');
+        if (mainVideo) {
+            activeVideo = mainVideo;
+            unmuteActiveVideo();
+            
+            // Add click event to toggle mute
+            mainVideo.addEventListener('click', function(e) {
+                // Don't interfere with video controls
+                if (e.target === mainVideo) {
+                    if (mainVideo.muted) {
+                        mainVideo.muted = false;
+                        mainVideo.volume = 1.0;
+                    } else {
+                        mainVideo.muted = true;
+                    }
+                }
+            });
+            
+            // Ensure video starts playing with sound
+            mainVideo.play().then(() => {
+                mainVideo.muted = false;
+                mainVideo.volume = 1.0;
+            }).catch(error => {
+                console.log('Autoplay with sound was prevented:', error);
+                // Add a play button or user interaction prompt
+                const playPrompt = document.createElement('div');
+                playPrompt.className = 'absolute inset-0 flex items-center justify-center cursor-pointer';
+                playPrompt.innerHTML = `
+                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 hover:bg-white/30 transition-all">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                `;
+                playPrompt.onclick = () => {
+                    mainVideo.muted = false;
+                    mainVideo.volume = 1.0;
+                    mainVideo.play();
+                    playPrompt.remove();
+                };
+                mainVideo.parentElement.appendChild(playPrompt);
+            });
+        }
+        
+        // Mute any other videos on the page
+        muteInactiveVideos();
+        
+        // Handle video navigation (when navigating between posts)
+        document.addEventListener('htmx:afterSwap', function(evt) {
+            if (evt.detail.target.id === 'postpage-content') {
+                manageVideoAudio();
+            }
+        });
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', manageVideoAudio);
+    
+    // Initialize for HTMX loaded content
+    document.addEventListener('htmx:load', function(evt) {
+        if (evt.detail.elt.id === 'postpage-content') {
+            manageVideoAudio();
+        }
+    });
+</script>
