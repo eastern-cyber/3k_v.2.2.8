@@ -41,14 +41,13 @@
     
     function updatePostpageAudio() {
         const postpage = document.getElementById('postpage-content');
-        const hasPostpage = !!postpage && postpage.isConnected;
+        // Check if element exists AND is actually visible (not inside a display:none modal)
+        const hasPostpage = !!(postpage && postpage.offsetParent !== null);
         
         // CSS helper: hide feed mute buttons when detail is open
         document.body.classList.toggle('postpage-active', hasPostpage);
         
         // ── No post detail open ─────────────────────────────
-        // Restore ONLY the videos this script previously muted.
-        // Leave everything else (explore thumbnails, etc.) completely alone.
         if (!hasPostpage) {
             document.querySelectorAll('video[' + SCRIPT_MUTED + ']').forEach(v => {
                 const wasMuted = v.getAttribute(PREV_MUTED) === 'true';
@@ -60,8 +59,6 @@
         }
         
         // ── Post detail is open ─────────────────────────────
-        // Mute every video OUTSIDE #postpage-content, but remember
-        // their original state so we can restore it later.
         document.querySelectorAll('video').forEach(v => {
             if (!postpage.contains(v)) {
                 if (!v.hasAttribute(SCRIPT_MUTED)) {
@@ -97,12 +94,15 @@
         updatePostpageAudio();
     }
     
-    // Run after HTMX swaps
+    // HTMX swaps (open post, prev/next, explore tag changes, etc.)
     document.body.addEventListener('htmx:afterSettle', updatePostpageAudio);
     
-    // Watch for modal open/close (Alpine x-show, HTMX OOB, etc.)
-    const observer = new MutationObserver(() => updatePostpageAudio());
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Modal open/close detection: watch ONLY #modalpage-content, not the entire DOM tree
+    const modalContent = document.getElementById('modalpage-content');
+    if (modalContent) {
+        const observer = new MutationObserver(() => updatePostpageAudio());
+        observer.observe(modalContent, { childList: true });
+    }
 })();
 </script>
 

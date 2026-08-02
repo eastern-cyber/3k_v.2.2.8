@@ -6,7 +6,13 @@
             hx-push-url="true">
         <div class="relative bg-black w-full aspect-[3/4] rounded-lg overflow-hidden">
             {% if post.video %}
-                <video class="w-full h-full object-cover" src="{{ post.video.url }}" autoplay muted loop playsinline></video>
+                <video class="w-full h-full object-cover" 
+                    src="{{ post.video.url }}" 
+                    preload="metadata"
+                    muted 
+                    loop 
+                    playsinline>
+                </video>
             {% elif post.image %}    
                 <img class="w-full h-full object-cover" src="{{ post.image.url }}">
             {% endif %}
