@@ -8,7 +8,11 @@
                 data-main-video
                 src="{{ post.video.url }}"
                 class="object-contain w-full h-full"
-                controls autoplay muted loop playsinline>
+                controls 
+                autoplay 
+                muted
+                loop 
+                playsinline>
             </video>
         {% elif post.image %}
             <img src="{{ post.image.url }}" class="object-contain w-full h-full">

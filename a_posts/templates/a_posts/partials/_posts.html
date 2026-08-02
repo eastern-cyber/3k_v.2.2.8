@@ -160,6 +160,11 @@
         padding: 0 !important;
     }
 }
+
+/* Hide feed mute buttons when post detail is active */
+.postpage-active article .group button.absolute.top-4.left-4 {
+    display: none !important;
+}
 </style>
 
 {% if posts %}
