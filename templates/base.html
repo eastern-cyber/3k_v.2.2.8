@@ -36,40 +36,49 @@
 (function() {
     'use strict';
     
+    const PREV_MUTED = 'data-prev-muted';
+    const SCRIPT_MUTED = 'data-script-muted';
+    
     function updatePostpageAudio() {
         const postpage = document.getElementById('postpage-content');
         const hasPostpage = !!postpage && postpage.isConnected;
         
-        // Toggle class for CSS (hides feed mute buttons when detail is open)
+        // CSS helper: hide feed mute buttons when detail is open
         document.body.classList.toggle('postpage-active', hasPostpage);
         
-        // No post detail open — do NOTHING. Let Alpine handle the feed.
+        // ── No post detail open ─────────────────────────────
+        // Restore ONLY the videos this script previously muted.
+        // Leave everything else (explore thumbnails, etc.) completely alone.
         if (!hasPostpage) {
-            // Optional: restore feed videos based on user's last choice
-            document.querySelectorAll('article video').forEach(v => {
-                v.muted = !window.userWantsSound;
+            document.querySelectorAll('video[' + SCRIPT_MUTED + ']').forEach(v => {
+                const wasMuted = v.getAttribute(PREV_MUTED) === 'true';
+                v.muted = wasMuted;
+                v.removeAttribute(SCRIPT_MUTED);
+                v.removeAttribute(PREV_MUTED);
             });
             return;
         }
         
-        const mainVideo = postpage.querySelector('video[data-main-video]');
-        if (!mainVideo) return;
-        
-        // Mute all videos OUTSIDE the post detail (feed videos in background)
+        // ── Post detail is open ─────────────────────────────
+        // Mute every video OUTSIDE #postpage-content, but remember
+        // their original state so we can restore it later.
         document.querySelectorAll('video').forEach(v => {
             if (!postpage.contains(v)) {
+                if (!v.hasAttribute(SCRIPT_MUTED)) {
+                    v.setAttribute(PREV_MUTED, v.muted);
+                    v.setAttribute(SCRIPT_MUTED, '');
+                }
                 v.muted = true;
             }
         });
         
         // Unmute the active post's main video
-        if (mainVideo.muted) {
+        const mainVideo = postpage.querySelector('video[data-main-video]');
+        if (mainVideo) {
             mainVideo.muted = false;
+            mainVideo.removeEventListener('volumechange', onMainVolumeChange);
+            mainVideo.addEventListener('volumechange', onMainVolumeChange);
         }
-        
-        // Enforce single-audio: if user unmutes manually, mute everything else
-        mainVideo.removeEventListener('volumechange', onMainVolumeChange);
-        mainVideo.addEventListener('volumechange', onMainVolumeChange);
     }
     
     function onMainVolumeChange(e) {
@@ -81,17 +90,17 @@
         }
     }
     
-    // Initial load
+    // Run on initial load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', updatePostpageAudio);
     } else {
         updatePostpageAudio();
     }
     
-    // After HTMX swaps (prev/next navigation)
+    // Run after HTMX swaps
     document.body.addEventListener('htmx:afterSettle', updatePostpageAudio);
     
-    // Detect modal open/close (Alpine x-show or direct DOM removal)
+    // Watch for modal open/close (Alpine x-show, HTMX OOB, etc.)
     const observer = new MutationObserver(() => updatePostpageAudio());
     observer.observe(document.body, { childList: true, subtree: true });
 })();
