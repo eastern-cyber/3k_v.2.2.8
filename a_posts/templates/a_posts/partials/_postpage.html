@@ -121,9 +121,11 @@
          @mousedown="startResize"
          @touchstart="startResize">
         <!-- Two-headed arrow icon (up/down) -->
-        <svg class="w-4 h-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" 
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M8 10l4-4 4 4M8 14l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg class="w-6 h-5 text-neutral-500 dark:text-neutral-400 group-hover:text-white pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <!-- Top horizontal line -->
+            <line x1="1" y1="8" x2="26" y2="8" stroke-linecap="round"/>
+            <!-- Bottom horizontal line -->
+            <line x1="1" y1="14" x2="26" y2="14" stroke-linecap="round"/>
         </svg>
     </div>
 
