@@ -286,7 +286,8 @@
                         โพสต์ของผู้ใช้ท่านนี้
                     </button>
                 </div>
-                <div x-show="selectedTab === 'comments'" class="px-8 pt-6 pb-24 overflow-y-auto hide-scrollbar flex-1">
+                <!-- 1. Scrollable comments area -->
+                <div x-show="selectedTab === 'comments'" class="px-8 pt-6 pb-6 overflow-y-auto hide-scrollbar flex-1 min-h-0">
                     <div id="comments_container" class="flex flex-col gap-6">
                         {% include "a_posts/partials/comments/_comment_loop.html" %}
                     </div>
@@ -321,8 +322,9 @@
                         {% endfor %}
                     </div>
                 </div>
+                <!-- 2. Comment form (remove absolute positioning) -->
                 {% if user.is_authenticated %}
-                <add-comment id="add_comment" x-show="selectedTab === 'comments'" class="absolute bottom-0 w-full bg-white dark:bg-black px-8 py-6 border-t border-neutral-300 dark:border-neutral-700 z-10">
+                <add-comment id="add_comment" x-show="selectedTab === 'comments'" class="block flex-shrink-0 w-full bg-white dark:bg-black px-8 py-6 border-t border-neutral-300 dark:border-neutral-700">
                     {% include "a_posts/partials/comments/_form_add_comment.html" %}
                 </add-comment>
                 {% endif %}
