@@ -245,7 +245,7 @@
             </a>
         </div>
         <div class="px-4">
-            <button id="search" @click="showDrawer = !showDrawer; showSearch = true" class="w-full h-10 bg-neutral-100 dark:bg-neutral-800 rounded-full pl-2.5 flex items-center cursor-pointer">
+            <button id="search" @click="openDrawer('showSearch')" class="w-full h-10 bg-neutral-100 dark:bg-neutral-800 rounded-full pl-2.5 flex items-center cursor-pointer">
                 <div class="size-5 flex-shrink-0">
                     <svg viewBox="0 0 48 48">
                         <path d="M21.83 7.5a14.34 14.34 0 1 1 0 28.68 14.34 14.34 0 0 1 0-28.68Zm0-4a18.33 18.33 0 1 0 11.48 32.64l8.9 8.9a1 1 0 0 0 1.42 0l1.4-1.41a1 1 0 0 0 0-1.42l-8.89-8.9A18.34 18.34 0 0 0 21.83 3.5Z"></path>
@@ -268,7 +268,9 @@
             </div>
         </div>
     </nav>
-    <side-drawer @click.outside="showDrawer = false; resetAll()" x-show="showDrawer" x-cloak class="fixed left-18 top-0 w-80 h-full border-l border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
+    <side-drawer @click.outside="closeOnOutsideClick($event)" 
+                 x-show="showDrawer && (showSearch || showActivity || showMessages || showMore || showColorModes)" 
+                 x-cloak class="fixed left-18 top-0 w-80 h-full border-l border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
                     x-transition:enter="transition duration-300 ease-out"
                     x-transition:enter-start="-translate-x-full opacity-0"
                     x-transition:enter-end="translate-x-0 opacity-100"
@@ -333,9 +335,6 @@
                         <span class="font-medium">ตั้งค่า</span>
                     </a>
                 </li>
-                <!-- In the "อื่นๆ" (More) section, replace the logout form with this: -->
-                <!-- In the "อื่นๆ" (More) section -->
-                <!-- In the "อื่นๆ" (More) section -->
                 <li>
                     <button onclick="logoutUser()" class="button-rounded dark:hover:!bg-neutral-800 w-full text-left">
                         <span class="font-medium">ล็อกเอ้าท์</span>
@@ -395,7 +394,6 @@
         if (form) {
             form.submit();
         } else {
-            // Fallback: redirect to logout URL
             window.location.href = "{% url 'account_logout' %}";
         }
     }
@@ -412,9 +410,38 @@
             resetAll() {
                 this.showSearch = false;
                 this.showActivity = false;
-                this.showMessages = false,
+                this.showMessages = false;
                 this.showMore = false;
                 this.showColorModes = false;
+            },
+            closeMobileSidebar() {
+                if (window.innerWidth <= 768) {
+                    const sidebarContainer = document.getElementById('sidebarContainer');
+                    const hamburgerBtn = document.getElementById('hamburgerBtn');
+                    const sidebarOverlay = document.getElementById('sidebarOverlay');
+                    if (sidebarContainer) sidebarContainer.classList.remove('open');
+                    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+                    if (sidebarOverlay) sidebarOverlay.classList.remove('visible');
+                    document.body.style.overflow = '';
+                }
+            },
+            navigate() {
+                this.showDrawer = true;
+                this.resetAll();
+                this.closeMobileSidebar();
+            },
+            openDrawer(drawer) {
+                this.showDrawer = true;
+                this.resetAll();
+                this[drawer] = true;
+                this.closeMobileSidebar();
+            },
+            closeOnOutsideClick(event) {
+                if (event.target.closest('#navigation') || event.target.closest('#search') || event.target.closest('#logo') || event.target.closest('.hamburger-btn')) {
+                    return;
+                }
+                this.showDrawer = false;
+                this.resetAll();
             }
         }
     }
@@ -425,7 +452,6 @@
         const sidebarContainer = document.getElementById('sidebarContainer');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         
-        // Only add mobile functionality on mobile
         function isMobile() {
             return window.innerWidth <= 768;
         }
@@ -446,37 +472,13 @@
             document.body.style.overflow = '';
         }
         
-        // Event listeners
         hamburgerBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', closeSidebar);
         
-        // Close sidebar when a navigation link is clicked
-        document.querySelectorAll('#navigation button, #search').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (isMobile() && this.closest('#navigation')) {
-                    setTimeout(closeSidebar, 200);
-                }
-            });
-        });
-        
-        // Handle window resize
         window.addEventListener('resize', function() {
             if (!isMobile()) {
                 closeSidebar();
-                sidebarContainer.classList.remove('open');
-                hamburgerBtn.classList.remove('active');
-                sidebarOverlay.classList.remove('visible');
-                document.body.style.overflow = '';
             }
-        });
-        
-        // Also close when clicking any link inside navigation
-        document.querySelectorAll('#navigation a, #navigation button').forEach(el => {
-            el.addEventListener('click', function() {
-                if (isMobile()) {
-                    setTimeout(closeSidebar, 250);
-                }
-            });
         });
     });
 </script>
