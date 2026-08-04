@@ -1,7 +1,70 @@
 {% load static %}
-<div id="postpage-content" class="flex flex-col lg:flex-row h-screen overflow-hidden">
+<div id="postpage-content" 
+     x-data="{
+         isResizing: false,
+         split: 50,
+         startY: 0,
+         startSplit: 50,
+         containerHeight: 0,
+         isMobile: window.innerWidth < 1024,
+         
+         init() {
+             const saved = localStorage.getItem('postpage_split');
+             if (saved) this.split = parseFloat(saved);
+             window.addEventListener('resize', () => {
+                 this.isMobile = window.innerWidth < 1024;
+             });
+         },
+         
+         startResize(e) {
+             if (!this.isMobile) return;
+             this.isResizing = true;
+             this.startSplit = this.split;
+             const isTouch = e.type === 'touchstart';
+             this.startY = isTouch ? e.touches[0].clientY : e.clientY;
+             this.containerHeight = this.$el.offsetHeight;
+             document.body.style.cursor = 'row-resize';
+             document.body.style.userSelect = 'none';
+         },
+         
+         onMove(e) {
+             if (!this.isResizing) return;
+             e.preventDefault();
+             const isTouch = e.type === 'touchmove';
+             const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+             const delta = clientY - this.startY;
+             const deltaPercent = (delta / this.containerHeight) * 100;
+             this.split = Math.max(25, Math.min(75, this.startSplit + deltaPercent));
+         },
+         
+         stopResize() {
+             if (!this.isResizing) return;
+             localStorage.setItem('postpage_split', this.split);
+             this.isResizing = false;
+             document.body.style.cursor = '';
+             document.body.style.userSelect = '';
+         },
+         
+         get leftStyle() {
+             return this.isMobile ? `height: ${this.split}%` : '';
+         },
+         
+         get rightStyle() {
+             return this.isMobile ? `height: ${100 - this.split}%` : '';
+         }
+     }"
+     x-init="init()"
+     @mousemove="onMove"
+     @mouseup="stopResize"
+     @mouseleave="stopResize"
+     @touchmove="onMove"
+     @touchend="stopResize"
+     class="flex flex-col lg:flex-row h-screen overflow-hidden"
+     :class="{ 'select-none': isResizing }">
+
     <!-- Main content (media) area -->
-    <div class="relative bg-black flex items-center justify-center w-full lg:w-1/2 h-[50vh] lg:h-full flex-shrink-0">
+    <div class="relative bg-black flex items-center justify-center w-full lg:w-1/2 lg:h-full flex-shrink-0"
+         :style="leftStyle">
         {% if post.video %}
             <video 
                 id="main-video-{{ post.uuid }}"
@@ -53,8 +116,20 @@
         </scroll-bar>
     </div>
 
+    <!-- Draggable Resize Handle (Mobile/Tablet only) -->
+    <div class="group relative z-20 flex-shrink-0 bg-neutral-300 dark:bg-neutral-700 hover:bg-cyan-500 active:bg-cyan-600 transition-all duration-200 lg:hidden cursor-row-resize flex items-center justify-center h-2 hover:h-3 touch-none"
+         @mousedown="startResize"
+         @touchstart="startResize">
+        <!-- Two-headed arrow icon (up/down) -->
+        <svg class="w-4 h-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" 
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M8 10l4-4 4 4M8 14l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
     <!-- Right panel - Always visible -->
-    <div class="w-full lg:w-[540px] lg:flex-shrink-0 bg-white dark:bg-black h-[50vh] lg:h-screen flex flex-col overflow-hidden">
+    <div class="w-full lg:w-[540px] lg:flex-shrink-0 bg-white dark:bg-black flex flex-col overflow-hidden"
+         :style="rightStyle">
         <div class="flex flex-col gap-4 h-full overflow-y-auto">
             <article-info class="block mx-4 mt-4 flex-shrink-0">
                 <div class="bg-neutral-100 dark:bg-neutral-900 rounded-xl p-4">
@@ -114,9 +189,17 @@
 
                 <button id="comments" class="flex items-center gap-1">
                     <div class="button-article !size-8 dark:!bg-neutral-800 hover:dark:!bg-neutral-900">
-                        <div class="size-5">
-                            <svg viewBox="0 0 48 48">
-                                <path fill-rule="evenodd" d="M2 21.5c0-10.22 9.88-18 22-18s22 7.78 22 18c0 5.63-3.19 10.74-7.32 14.8a43.6 43.6 0 0 1-14.14 9.1A1.5 1.5 0 0 1 22.5 44v-5.04C11.13 38.4 2 31.34 2 21.5M14 25a3 3 0 1 0 0-6 3 3 0 0 0 0 6m10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6m13-3a3 3 0 1 1-6 0 3 3 0 0 1 6 0" clip-rule="evenodd"></path>
+                        <div class="size-6">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M38 8H10C6.68629 8 4 10.6863 4 14V30C4 33.3137 6.68629 36 10 36H14V42L22 36H38C41.3137 36 44 33.3137 44 30V14C44 10.6863 41.3137 8 38 8Z" 
+                                        stroke="currentColor" 
+                                        stroke-width="2.5" 
+                                        stroke-linejoin="round"
+                                        fill="none"/>
+                                
+                                <circle cx="18" cy="22" r="2.5" fill="currentColor"/>
+                                <circle cx="26" cy="22" r="2.5" fill="currentColor"/>
+                                <circle cx="34" cy="22" r="2.5" fill="currentColor"/>
                             </svg>
                         </div>
                     </div>
