@@ -4,5 +4,5 @@
     hx-swap="innerHTML">
     {% csrf_token %}
     <input x-model="input" type="text" name="comment" placeholder="เพิ่มคอมเม้นท์..." autocomplete="off" class="grow bg-neutral-100 dark:bg-neutral-800 rounded-lg px-4 py-2 text-sm placeholder-neutral-500 outline-none border border-transparent focus:border-neutral-300 dark:focus:border-neutral-800">
-    <button :type="input ? 'submit' : 'button'" class="shrink-0 ml-2 px-4 font-medium" :class="input ? 'text-red-500' : 'text-neutral-400 !cursor-not-allowed'">โพสต์</button>
+    <button :type="input ? 'submit' : 'button'" class="shrink-0 ml-2 px-4 font-medium" :class="input ? 'text-red-500' : 'text-neutral-400 !cursor-not-allowed'">ส่ง</button>
 </form>

@@ -117,15 +117,16 @@
     </div>
 
     <!-- Draggable Resize Handle (Mobile/Tablet only) -->
-    <div class="group relative z-20 flex-shrink-0 bg-neutral-300 dark:bg-neutral-700 hover:bg-cyan-500 active:bg-cyan-600 transition-all duration-200 lg:hidden cursor-row-resize flex items-center justify-center h-2 hover:h-3 touch-none"
-         @mousedown="startResize"
-         @touchstart="startResize">
-        <!-- Two-headed arrow icon (up/down) -->
-        <svg class="w-5 h-6 text-neutral-500 dark:text-neutral-400 group-hover:text-white pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <!-- Top horizontal line -->
-            <line x1="1" y1="8" x2="30" y2="8" stroke-linecap="round"/>
-            <!-- Bottom horizontal line -->
-            <line x1="1" y1="14" x2="30" y2="14" stroke-linecap="round"/>
+    <div class="group relative z-20 flex-shrink-0 bg-neutral-300 dark:bg-neutral-700 hover:bg-cyan-500 active:bg-cyan-600 transition-all duration-200 lg:hidden cursor-row-resize flex items-center justify-center h-2 hover:h-3 touch-none overflow-hidden"
+        @mousedown="startResize"
+        @touchstart="startResize">
+        <svg class="w-5 h-full text-neutral-500 dark:text-neutral-400 group-hover:text-white pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2.5">
+            <line x1="2" y1="8" x2="22" y2="8" stroke-linecap="round"/>
+            <line x1="2" y1="14" x2="22" y2="14" stroke-linecap="round"/>
         </svg>
     </div>
 
