@@ -281,7 +281,7 @@
             <article-comments x-data="{ selectedTab: 'comments' }" class="relative flex-1 overflow-hidden flex flex-col min-h-0">
                 <div class="grid grid-cols-2 px-8 text-sm text-center font-medium border-b border-neutral-300 dark:border-neutral-800 flex-shrink-0">
                     <button @click="selectedTab = 'comments'" class="border-b-2 pb-2" :class="selectedTab === 'comments' ? 'border-black dark:border-white' : 'text-neutral-400 border-transparent'">
-                        คอมเม้นท์ (<span id='tab_comment_count'>{{ post.comments.count }}</span>)
+                        คอมเม้นท์ (<span id='comment_count'>{{ post.comments.count }}</span>)
                     </button>
                     <button @click="selectedTab = 'posts'" class="border-b-2 pb-2" :class="selectedTab === 'posts' ? 'border-black dark:border-white' : 'text-neutral-400 border-transparent'">
                         โพสต์ของผู้ใช้ท่านนี้
