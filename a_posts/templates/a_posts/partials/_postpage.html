@@ -60,7 +60,8 @@
      @touchmove="onMove"
      @touchend="stopResize"
      class="flex flex-col lg:flex-row h-screen overflow-hidden"
-     :class="{ 'select-none': isResizing }">
+     :class="{ 'select-none': isResizing }"
+     >
 
     <!-- Main content (media) area -->
     <div class="relative bg-black flex items-center justify-center w-full lg:w-1/2 lg:h-full flex-shrink-0"
@@ -148,7 +149,11 @@
                     </svg>
                 </button>
 
-                <div x-show="metaExpanded" x-collapse class="flex flex-col gap-2">
+                <div    x-show="metaExpanded" x-collapse class="flex flex-col gap-2"
+                        x-show="modalPage" x-cloak
+                        x-transition:enter="transition ease-out duration-600"
+                        x-transition:enter-start="opacity-0 scale-60"
+                        x-transition:enter-end="opacity-100 scale-100">
                     <article-info class="block mx-4 mt-4 flex-shrink-0">
                         <div class="bg-neutral-100 dark:bg-neutral-900 rounded-sm p-3">
                             {% if post.author %}
@@ -219,17 +224,17 @@
 
                 <button id="comments" class="flex items-center gap-1">
                     <div class="button-article !size-8 dark:!bg-neutral-800 hover:dark:!bg-neutral-900">
-                        <div class="size-6">
+                        <div class="size-5">
                             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M38 8H10C6.68629 8 4 10.6863 4 14V30C4 33.3137 6.68629 36 10 36H14V42L22 36H38C41.3137 36 44 33.3137 44 30V14C44 10.6863 41.3137 8 38 8Z" 
                                         stroke="currentColor" 
                                         stroke-width="3" 
                                         stroke-linejoin="round"
-                                        fill="none"/>
+                                        fill="currentColor"/>
                                 
-                                <circle cx="14" cy="22" r="2.5" fill="currentColor"/>
-                                <circle cx="24" cy="22" r="2.5" fill="currentColor"/>
-                                <circle cx="34" cy="22" r="2.5" fill="currentColor"/>
+                                <circle cx="14" cy="22" r="2.5" fill="#AAA"/>
+                                <circle cx="24" cy="22" r="2.5" fill="#AAA"/>
+                                <circle cx="34" cy="22" r="2.5" fill="#AAA"/>
                             </svg>
                         </div>
                     </div>
