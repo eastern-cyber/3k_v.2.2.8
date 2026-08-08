@@ -5,6 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token }}">
         <title>{% block title %}{% endblock %}KokKokKok</title>
         <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" >
         <meta property="og:site_name" content="KokKokKok Clone">
@@ -104,6 +105,87 @@
         observer.observe(modalContent, { childList: true });
     }
 })();
+
+function walletLogin() {
+    return {
+        address: null,
+        isLoading: false,
+        buttonText: 'Connect Wallet',
+        errorMessage: '',
+
+        init() {
+            // Optional: check if already connected (e.g., after page reload)
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                this.address = window.ethereum.selectedAddress;
+                this.buttonText = this.address.slice(0, 6) + '...' + this.address.slice(-4);
+            }
+        },
+
+        async connectWallet() {
+            this.isLoading = true;
+            this.errorMessage = '';
+
+            try {
+                // 1. Check for MetaMask / TrustWallet / etc.
+                if (!window.ethereum) {
+                    throw new Error('Please install a crypto wallet like MetaMask or TrustWallet.');
+                }
+
+                // 2. Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const walletAddress = accounts[0];
+                this.address = walletAddress;
+                this.buttonText = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+
+                // 3. Get nonce from your Django backend
+                const nonceResponse = await fetch('/api/wallet/nonce/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address: walletAddress })
+                });
+                const nonceData = await nonceResponse.json();
+                if (!nonceResponse.ok) {
+                    throw new Error(nonceData.error || 'Failed to get nonce');
+                }
+                const nonce = nonceData.nonce;
+
+                // 4. Sign the nonce with the wallet
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [nonce, walletAddress]
+                });
+
+                // 5. Send signature to your backend for verification
+                const verifyResponse = await fetch('/api/wallet/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        address: walletAddress,
+                        signature: signature
+                    })
+                });
+                const verifyData = await verifyResponse.json();
+
+                if (!verifyResponse.ok) {
+                    throw new Error(verifyData.error || 'Verification failed');
+                }
+
+                // 6. Success! Reload the page to reflect the logged-in user.
+                window.location.reload();
+
+            } catch (error) {
+                console.error(error);
+                this.errorMessage = error.message;
+                this.buttonText = 'Connect Wallet';
+            } finally {
+                this.isLoading = false;
+            }
+        }
+    }
+}
 </script>
 
 </body>

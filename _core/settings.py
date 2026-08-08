@@ -64,6 +64,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # <-- Add this
+    'wallet_auth',  # <-- Add this
+    #'metamask_auth',  # Add this
+    #'web3auth',   # <-- ADD THIS (note: it's 'web3auth', not 'metamask_auth')
     'a_pages',
 
     
@@ -153,7 +156,11 @@ if DEBUG:
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    #'metamask_auth.backend.MetaMaskBackend',      # Add the wallet backend
+    #'web3auth.backend.Web3Backend',               # <-- ADD THIS
 ]
+# Optional: Automatically create a user record when a new wallet connects
+META_MASK_AUTH_CREATE_USER = True
 
 ROOT_URLCONF = '_core.urls'
 

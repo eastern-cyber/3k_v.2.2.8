@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from allauth.account.views import PasswordChangeView
 from a_posts.views import *
 from a_users.views import profile_view, index_view, signup_otp_view, settings_view  # Add settings_view
+from wallet_auth import views
 
 urlpatterns = [
     path('', include('a_pages.urls')),  # Add this line
@@ -17,6 +18,11 @@ urlpatterns = [
     
     # Keep allauth URLs for other features
     path('accounts/', include('allauth.urls')),
+    
+    path('api/wallet/nonce/', views.get_nonce, name='wallet_nonce'),
+    path('api/wallet/login/', views.verify_signature, name='wallet_login'),
+    # path('api/wallet/', include('metamask_auth.urls')),  # Adds /api/wallet/nonce/ and /api/wallet/verify/
+    # path('api/wallet/', include('web3auth.urls')),  # <-- ADD THIS
     
     path('login/', index_view, name="index"),
     path('@<username>/', profile_view, name="profile"),
