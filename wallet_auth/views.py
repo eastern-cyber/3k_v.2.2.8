@@ -33,7 +33,7 @@ def get_nonce(request):
         nonce = secrets.token_hex(32)
 
         # Use full address as username to avoid collisions
-        username = f"wallet_{address}"
+        username = address
         user, created = User.objects.get_or_create(
             username=username,
             defaults={'password': make_password(None)}  # <-- FIXED
