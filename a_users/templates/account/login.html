@@ -79,7 +79,7 @@
 
         <!-- Wallet Login Buttons -->
         <div class="mt-6">
-            <div class="relative">
+            <div class="relative mb-4">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t border-neutral-200"></div>
                 </div>
@@ -87,17 +87,18 @@
                     <span class="px-2 bg-white text-neutral-500">หรือเข้าสู่ระบบด้วย</span>
                 </div>
             </div>
+
             <div class="flex justify-center w-full">
-                <div x-data="walletLogin()" x-init="init()" class="inline-block">
+                <div x-data="walletLogin()" x-init="init()" class="flex flex-col items-center">
                     <button @click="connectWallet()"
                             :disabled="isLoading"
                             class="px-4 py-2 bg-rose-500 hover:bg-rose-600 active:bg-rose-700 
-                            text-black dark:text-white 
-                            rounded-full text-sm font-medium 
-                            transition-all duration-200 
-                            flex items-center gap-2 
-                            shadow-sm hover:shadow-md 
-                            focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                                text-black dark:text-white 
+                                rounded-full text-sm font-medium 
+                                transition-all duration-200 
+                                flex items-center gap-2 
+                                shadow-sm hover:shadow-md 
+                                focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                         
                         <!-- Wallet SVG Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" 
@@ -114,8 +115,10 @@
                         <span x-text="buttonText"></span>
                     </button>
 
-                    <!-- optional status message -->
-                    <p x-show="errorMessage" x-text="errorMessage" class="text-red-500 text-xs mt-1"></p>
+                    <!-- Status message below the button, centered -->
+                    <p x-show="errorMessage" 
+                    x-text="errorMessage" 
+                    class="text-red-500 text-xs mt-3 text-center"></p>
                 </div>
             </div>
         </div>
