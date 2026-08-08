@@ -7,6 +7,7 @@ from django.contrib.auth import login, get_user_model
 from django.utils import timezone
 from web3 import Web3
 from eth_account.messages import encode_defunct
+from django.contrib.auth.hashers import make_password
 
 from .models import WalletProfile
 
@@ -33,7 +34,14 @@ def get_nonce(request):
 
         # Use full address as username to avoid collisions
         username = f"wallet_{address}"
-        user, _ = User.objects.get_or_create(username=username, defaults={'password': None})
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={'password': make_password(None)}  # <-- FIXED
+        )
+        # If the user already exists but has an empty/null password, fix it
+        if not created and (not user.password or user.password == ''):
+            user.password = make_password(None)
+            user.save()
 
         profile, created = WalletProfile.objects.get_or_create(
             wallet_address=address,
