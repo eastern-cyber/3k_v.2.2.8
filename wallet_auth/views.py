@@ -36,7 +36,7 @@ def get_nonce(request):
         username = address
         user, created = User.objects.get_or_create(
             username=username,
-            defaults={'password': make_password(None)}  # <-- FIXED
+            defaults={'password': make_password(None)}
         )
         # If the user already exists but has an empty/null password, fix it
         if not created and (not user.password or user.password == ''):
@@ -95,9 +95,13 @@ def verify_signature(request):
         if (timezone.now() - profile.nonce_created_at).seconds > 300:
             return JsonResponse({'error': 'Nonce expired. Please refresh and try again.'}, status=400)
 
-        # Recover the address from the signature
-        message = encode_defunct(text=nonce)
+        # ========== FIX: Convert nonce to UTF-8 hex (matches frontend's utf8ToHex) ==========
+        # The frontend signs: "0x" + hex-encoded UTF-8 bytes of the nonce string
+        nonce_bytes = nonce.encode('utf-8')
+        nonce_hex = '0x' + nonce_bytes.hex()
+
         try:
+            message = encode_defunct(hexstr=nonce_hex)
             recovered = w3.eth.account.recover_message(message, signature=signature)
         except Exception as e:
             logger.error(f"Recovery error: {e}")

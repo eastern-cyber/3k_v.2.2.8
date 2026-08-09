@@ -106,6 +106,15 @@
     }
 })();
 
+// ======== HELPER: Convert plain string to UTF-8 hex with 0x prefix ========
+function utf8ToHex(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    return '0x' + Array.from(utf8Bytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+// ========================================================================
+
 function walletLogin() {
     return {
         address: null,
@@ -149,10 +158,14 @@ function walletLogin() {
                 }
                 const nonce = nonceData.nonce;
 
-                // 4. Sign the nonce with the wallet
+                // ========== FIX: Convert nonce to UTF-8 hex before signing ==========
+                const hexNonce = utf8ToHex(nonce);
+                // ===================================================================
+
+                // 4. Sign the nonce with the wallet (using hexNonce)
                 const signature = await window.ethereum.request({
                     method: 'personal_sign',
-                    params: [nonce, walletAddress]
+                    params: [hexNonce, walletAddress]   // <-- changed from nonce to hexNonce
                 });
 
                 // 5. Send signature to your backend for verification
