@@ -9,18 +9,18 @@
             @drop.prevent="fileDropped($event)"
             >
             {% csrf_token %}
-            <upload-box x-show="!fileUrl" class="block rounded-xl py-32 border border-dashed" :class="isDragging ? 'border-blue-400 dark:border-blue-500/50 bg-blue-50 dark:bg-blue-950/40' : 'border-neutral-400 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-900'">
-                <div class="flex flex-col gap-1 items-center text-center w-max mx-auto" :class="{ 'pointer-events-none' : isDragging }">
-                    <div class="size-12">
-                        <svg class="scale-75" viewBox="0 0 48 48">
+            <upload-box x-show="!fileUrl" class="block rounded-xl py-16 sm:py-24 md:py-32 border border-dashed" :class="isDragging ? 'border-blue-400 dark:border-blue-500/50 bg-blue-50 dark:bg-blue-950/40' : 'border-neutral-400 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-900'">
+                <div class="flex flex-col gap-1 items-center text-center w-full max-w-[280px] sm:max-w-[400px] m-auto p-4" :class="{ 'pointer-events-none' : isDragging }">
+                    <div class="size-10 sm:size-12 flex-shrink-0">
+                        <svg class="w-full h-full" viewBox="0 0 48 48">
                             <path d="M25 15a1 1 0 0 1 1 1v6h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-6v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-6h-6a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h6v-6a1 1 0 0 1 1-1h2Z"></path>
                             <path d="M33.58 4.5H14.42c-1.33 0-2.45 0-3.37.07-.95.08-1.86.25-2.73.7a7 7 0 0 0-3.06 3.05 7.14 7.14 0 0 0-.69 2.73 44.6 44.6 0 0 0-.07 3.37v19.16c0 1.33 0 2.45.07 3.37.08.95.25 1.86.7 2.73a7 7 0 0 0 3.05 3.06c.87.44 1.78.6 2.73.69.92.07 2.04.07 3.37.07h19.16c1.33 0 2.45 0 3.37-.07a7.14 7.14 0 0 0 2.73-.7 7 7 0 0 0 3.06-3.05c.44-.87.6-1.78.69-2.73.07-.92.07-2.04.07-3.37V14.42c0-1.33 0-2.45-.07-3.37a7.14 7.14 0 0 0-.7-2.73 7 7 0 0 0-3.05-3.06 7.14 7.14 0 0 0-2.73-.69 44.6 44.6 0 0 0-3.37-.07ZM10.14 8.83c.2-.1.53-.21 1.24-.27.73-.06 1.69-.06 3.12-.06h19c1.43 0 2.39 0 3.12.06a3.3 3.3 0 0 1 1.24.27 3 3 0 0 1 1.31 1.3c.1.21.21.54.27 1.25.06.73.06 1.69.06 3.12v19c0 1.43 0 2.39-.06 3.12a3.3 3.3 0 0 1-.27 1.24 3 3 0 0 1-1.3 1.31c-.21.1-.54.21-1.25.27-.73.06-1.69.06-3.12.06h-19c-1.43 0-2.39 0-3.12-.06a3.3 3.3 0 0 1-1.24-.27 3 3 0 0 1-1.31-1.3c-.1-.21-.21-.54-.27-1.25-.06-.73-.06-1.69-.06-3.12v-19c0-1.43 0-2.39.06-3.12a3.3 3.3 0 0 1 .27-1.24 3 3 0 0 1 1.3-1.31Z"></path>
                         </svg>
                     </div>
-                    <h1>Select image or video to upload</h1>
-                    <div class="text-neutral-500 mb-3">Or drag and drop it here</div>
-                    <button type="button" @click="$refs.inputFileSelected.click()" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2 font-medium" :class="{ 'opacity-0' : isDragging }">
-                        Select Image or Video
+                    <h1 class="text-base sm:text-lg font-medium break-words">เลือกภาพ หรือ วิดีโอคลิป</h1>
+                    <div class="text-neutral-500 mb-2 sm:mb-3 text-m sm:text-base">หรือลากไฟล์มาวางในกรอบนี้</div>
+                    <button type="button" @click="$refs.inputFileSelected.click()" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-4 sm:px-7 py-1.5 sm:py-2 font-medium text-sm sm:text-base whitespace-nowrap" :class="{ 'opacity-0' : isDragging }">
+                        เลือก
                     </button>
                     <input name="file" required class="hidden" type="file" accept="image/*,video/*" x-ref="inputFileSelected" @change="fileSelected" />
                 </div>
@@ -30,32 +30,32 @@
                     <div class="flex items-center order-2 lg:order-1">
                         <div class="flex flex-col gap-4 w-full">
                             <div>
-                                <label class="block font-bold text-neutral-600">Caption</label>
-                                <textarea name="body" type="text" maxlength="80" x-model="caption" placeholder="Add a caption here..." class="w-full min-h-36 py-3 px-4 bg-neutral-100 dark:bg-neutral-900 rounded-lg outline-none resize-none"></textarea>
+                                <label class="block font-bold text-neutral-600">แค๊ปชั่น</label>
+                                <textarea name="body" type="text" maxlength="80" x-model="caption" placeholder="เพิ่มรายละเอียด..." class="w-full min-h-36 py-3 px-4 bg-neutral-100 dark:bg-neutral-900 rounded-lg outline-none resize-none"></textarea>
                             </div>
                             <div>
-                                <label class="block font-bold text-neutral-600">Hashtags</label>
-                                <input name="tags" type="text" maxlength="80" x-model="hashtag" placeholder="#tags - separated by a space" 
+                                <label class="block font-bold text-neutral-600">แฮ็ชแท็ก</label>
+                                <input name="tags" type="text" maxlength="80" x-model="hashtag" placeholder="#tags - แยกแฮ็ชแท็กแต่ละคำด้วยการเว้นวรรค" 
                                     hx-get="{% url 'search_suggestions' %}"
                                     hx-trigger="input delay:300ms"
                                     hx-target="#hashtag_suggestions"
                                     hx-swap="innerHTML"
                                     class="w-full py-3 px-4 bg-neutral-100 dark:bg-neutral-900 rounded-lg outline-none"/>
                             </div>
-                            <div class="flex gap-3">
-                                <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2 font-medium">
-                                    Submit Post
+                            <div class="flex gap-3 flex-wrap">
+                                <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-5 sm:px-7 py-2 font-medium text-sm sm:text-base">
+                                    โพสต์
                                 </button>
-                                <button @click="discardUpload" type="button" class="bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800/80 text-neutral-500 rounded-md px-4 py-2 font-medium">
-                                    Discard
+                                <button @click="discardUpload" type="button" class="bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-800/80 text-neutral-500 rounded-md px-4 py-2 font-medium text-sm sm:text-base">
+                                    ยกเลิก
                                 </button>
                             </div>
                             <div id="hashtag_suggestions" class="relative"></div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-center max-h-[500px] lg:h-[500px] order-1 lg:order-2">
+                    <div class="flex items-center justify-center max-h-[300px] sm:max-h-[400px] lg:h-[500px] order-1 lg:order-2">
                         <template x-if="fileType === 'image'">
-                            <img :src="fileUrl" class="max-h-full max-w-full">
+                            <img :src="fileUrl" class="max-h-full max-w-full object-contain">
                         </template>
                         <template x-if="fileType === 'video'">
                             <video :src="fileUrl" class="max-h-full max-w-full" controls autoplay loop muted></video>
@@ -110,7 +110,6 @@
         }
     }
 </script>
-
 
 {% if request.htmx %}
 <title hx-swap-oob>Upload - KokKokKok</title>
