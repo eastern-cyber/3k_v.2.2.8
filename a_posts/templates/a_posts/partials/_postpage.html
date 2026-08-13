@@ -1,4 +1,11 @@
 {% load static %}
+<style>
+    /* Hide the mute button from the background feed when post detail is open */
+    button.absolute.top-4.left-4.bg-black\/20.p-3.rounded-full.z-20 {
+        display: none !important;
+    }
+</style>
+
 <div id="postpage-content" 
      x-data="{
          isResizing: false,
@@ -74,7 +81,7 @@
                 class="object-contain w-full h-full"
                 controls 
                 autoplay 
-                muted
+
                 loop 
                 playsinline>
             </video>
