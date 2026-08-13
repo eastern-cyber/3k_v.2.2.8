@@ -180,6 +180,7 @@ def post_page_view(request, pk=None):
         'next_post': next_post,
         'user_authenticated': request.user.is_authenticated,
         'is_crawler': False,
+        'disable_oob': True,   # <--- ADD THIS LINE
     }
     
     if request.htmx:

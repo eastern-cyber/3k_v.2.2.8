@@ -1,17 +1,17 @@
 {% for comment in post.parent_comments %}
-{% include "a_posts/partials/comments/_comment.html" %}
+    {% include "a_posts/partials/comments/_comment.html" %}
 {% empty %}
-<div class="text-center text-neutral-400 text-sm">มาเป็นคนแรกที่คอมเม้นท์โพสต์นี้กันเถอะ!</div>
+    <div class="text-center text-neutral-400 text-sm">มาเป็นคนแรกที่คอมเม้นท์โพสต์นี้กันเถอะ!</div>
 {% endfor %}
 
 {% if request.htmx %}
+    {% if not disable_oob %}
+        <!-- Swap with new add comment form -->
+        <div hx-swap-oob="innerHTML" id="add_comment">
+            {% include "a_posts/partials/comments/_form_add_comment.html" %}
+        </div>
 
-<!-- Swap with new add comment form -->
-<div hx-swap-oob="innerHTML" id="add_comment">
-    {% include "a_posts/partials/comments/_form_add_comment.html" %}
-</div>
-
-<!-- Update comment count -->
-<div hx-swap-oob="innerHTML" id="comment_count">{{ post.comments.count }}</div>
-
+        <!-- Update comment count -->
+        <div hx-swap-oob="innerHTML" id="comment_count">{{ post.comments.count }}</div>
+    {% endif %}
 {% endif %}

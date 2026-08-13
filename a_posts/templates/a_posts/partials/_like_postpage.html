@@ -14,27 +14,27 @@
 </button> 
 
 {% if request.htmx %}
+    {% if not disable_oob %}
+        <!-- Update like count on home post -->
+        <div hx-swap-oob="innerHTML" id="like_home_{{ post.uuid }}">
+        {% include 'a_posts/partials/_like_home.html' %}
+        </div>
 
-<!-- Update like count on home post -->
-<div hx-swap-oob="innerHTML" id="like_home_{{ post.uuid }}">
-{% include 'a_posts/partials/_like_home.html' %}
-</div>
+        <!-- Update like count on post likes -->
+        <span hx-swap-oob="innerHTML" id="post_like_{{ post.uuid }}">
+            {{ post.likes.count }}
+        </span>
 
-<!-- Update like count on post likes -->
-<span hx-swap-oob="innerHTML" id="post_like_{{ post.uuid }}">
-    {{ post.likes.count }}
-</span>
+        <!-- Hide un-liked post on profile page -->
+        {% if user not in post.likes.all %}
+            <div hx-swap-oob="outerHTML" id="liked_post_{{ post.uuid }}" class="hidden"></div>
+        {% endif %}
 
-<!-- Hide un-liked post on profile page -->
-{% if user not in post.likes.all %}
-<div hx-swap-oob="outerHTML" id="liked_post_{{ post.uuid }}" class="hidden"></div>
-{% endif %}
-
-<!-- Update user likes on profile page -->
-{% if profile_user_likes  %} 
-<span hx-swap-oob="innerHTML" id="post_user_likes">
-    {{ profile_user_likes }}
-</span>
-{% endif %}
-
+        <!-- Update user likes on profile page -->
+        {% if profile_user_likes  %} 
+            <span hx-swap-oob="innerHTML" id="post_user_likes">
+                {{ profile_user_likes }}
+            </span>
+        {% endif %}
+    {% endif %}            
 {% endif %}

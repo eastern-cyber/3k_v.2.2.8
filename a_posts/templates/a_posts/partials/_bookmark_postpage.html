@@ -15,15 +15,15 @@
 
 
 {% if request.htmx %}
+    {% if not disable_oob %}
+        <!-- Update bookmark count on home post -->
+        <div hx-swap-oob="innerHTML" id="bookmark_home_{{ post.uuid }}">
+            {% include 'a_posts/partials/_bookmark_home.html' %}
+        </div>
 
-<!-- Update bookmark count on home post -->
-<div hx-swap-oob="innerHTML" id="bookmark_home_{{ post.uuid }}">
-{% include 'a_posts/partials/_bookmark_home.html' %}
-</div>
-
-<!-- Hide the un-bookmarked post on profile page -->
-{% if user not in post.bookmarks.all %}
-<div hx-swap-oob="outerHTML" id="bookmarked_post_{{ post.uuid }}" class="hidden"></div>
-{% endif %}
-
+        <!-- Hide the un-bookmarked post on profile page -->
+        {% if user not in post.bookmarks.all %}
+            <div hx-swap-oob="outerHTML" id="bookmarked_post_{{ post.uuid }}" class="hidden"></div>
+        {% endif %}
+    {% endif %}
 {% endif %}
