@@ -7,9 +7,17 @@
             </div>
             <div class="flex flex-col gap-3 items-center md:items-start text-center md:text-left">
                 <div class="space-x-4 items-end">
-                    <span class="text-2xl font-bold">{{ profile_user.username }}</span>
+                    {% if profile_user.username %}
+                        {% with username=profile_user.username %}
+                            {% if username|length == 42 and username|slice:":2" == "0x" %}
+                                <span class="text-2xl font-bold">{{ username|slice:":6" }}...{{ username|slice:"-4:" }}</span>
+                                {% else %}
+                                <span class="text-2xl font-bold">{{ profile_user.username }}</span>  
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
                     {% if profile_user.name %}
-                    <span class="text-lg font-medium">{{ profile_user.name }}</span>
+                        <p class="text-lg font-medium">{{ profile_user.name }}</p>
                     {% endif %}
                 </div>
                 <div class="flex gap-2 font-medium">

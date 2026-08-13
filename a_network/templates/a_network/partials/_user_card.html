@@ -2,7 +2,7 @@
     <a href="{% url 'profile' this_user.username  %}" class="size-22 rounded-full overflow-hidden">
         <img src="{{ this_user.avatar }}" class="w-full h-full object-cover">
     </a>
-    <p class="text-sm text-center truncate w-full -mt-4">
+    <p class="text-sm text-center truncate w-full -mt-4 pt-2">
         {% if this_user.username %}
             {% with username=this_user.username %}
                 {% if username|length == 42 and username|slice:":2" == "0x" %}
