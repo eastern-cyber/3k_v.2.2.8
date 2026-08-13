@@ -228,7 +228,7 @@
         <article-info class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
             <div class="absolute bottom-0 p-5 text-white z-10">
                 {% if post.author %}
-                <a href="{% url 'profile' post.author.username %}" class="hover:underline pointer-events-auto">{{ post.author }}</a>
+                <a href="{% url 'profile' post.author.username %}" class="hover:underline pointer-events-auto">{{ post.author.name }}</a>
                 {% endif %}
                 {% if post.tags.exists %}
                 <div class="mt-1">
