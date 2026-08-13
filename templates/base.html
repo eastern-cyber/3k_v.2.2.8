@@ -22,11 +22,14 @@
         {% endblock %}
         {% htmx_script %}
         <script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-ws"></script>
+        <!-- Load Alpine.js Collapse plugin FIRST -->
+        <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+        <!-- Then load Alpine.js core -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
     </head>
-<body x-data="{ modalPage: false, modalBox: false }" class="dark:bg-black dark:text-white dark:fill-white" hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+<body x-data="mainApp()" x-init="init()" class="dark:bg-black dark:text-white dark:fill-white" hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
 
 {% include 'includes/modal.html' %}
 
@@ -34,77 +37,64 @@
 {% endblock %}
 
 <script>
-(function() {
-    'use strict';
-    
-    const PREV_MUTED = 'data-prev-muted';
-    const SCRIPT_MUTED = 'data-script-muted';
-    
-    function updatePostpageAudio() {
-        const postpage = document.getElementById('postpage-content');
-        // Check if element exists AND is actually visible (not inside a display:none modal)
-        const hasPostpage = !!(postpage && postpage.offsetParent !== null);
+function mainApp() {
+    return {
+        modalPage: false,
+        modalBox: false,
+        returnUrl: window.location.pathname,
+        darkMode: {{ user.darkmode|yesno:'true,false' }},
         
-        // CSS helper: hide feed mute buttons when detail is open
-        document.body.classList.toggle('postpage-active', hasPostpage);
-        
-        // ── No post detail open ─────────────────────────────
-        if (!hasPostpage) {
-            document.querySelectorAll('video[' + SCRIPT_MUTED + ']').forEach(v => {
-                const wasMuted = v.getAttribute(PREV_MUTED) === 'true';
-                v.muted = wasMuted;
-                v.removeAttribute(SCRIPT_MUTED);
-                v.removeAttribute(PREV_MUTED);
-            });
-            return;
-        }
-        
-        // ── Post detail is open ─────────────────────────────
-        document.querySelectorAll('video').forEach(v => {
-            if (!postpage.contains(v)) {
-                if (!v.hasAttribute(SCRIPT_MUTED)) {
-                    v.setAttribute(PREV_MUTED, v.muted);
-                    v.setAttribute(SCRIPT_MUTED, '');
-                }
-                v.muted = true;
+        init() {
+            // Initialize dark mode
+            if (this.darkMode) {
+                document.documentElement.classList.add('dark');
             }
-        });
-        
-        // Unmute the active post's main video
-        const mainVideo = postpage.querySelector('video[data-main-video]');
-        if (mainVideo) {
-            mainVideo.muted = false;
-            mainVideo.removeEventListener('volumechange', onMainVolumeChange);
-            mainVideo.addEventListener('volumechange', onMainVolumeChange);
-        }
-    }
-    
-    function onMainVolumeChange(e) {
-        const video = e.target;
-        if (!video.muted) {
-            document.querySelectorAll('video').forEach(v => {
-                if (v !== video && !v.muted) v.muted = true;
+            
+            // Watch for modal changes
+            this.$watch('modalPage', (value) => {
+                if (!value) {
+                    const content = document.getElementById('modalpage-content');
+                    if (content) content.innerHTML = '';
+                }
+                // Toggle body scroll
+                document.body.style.overflow = value ? 'hidden' : '';
             });
+            
+            this.$watch('modalBox', (value) => {
+                if (!value) {
+                    const content = document.getElementById('modalbox-content');
+                    if (content) content.innerHTML = '';
+                }
+            });
+        },
+        
+        closeModal() {
+            this.modalPage = false;
+            const content = document.getElementById('modalpage-content');
+            if (content) content.innerHTML = '';
+            window.history.replaceState({}, '', this.returnUrl || '/');
+            document.body.style.overflow = '';
+        },
+        
+        closeBox() {
+            this.modalBox = false;
+            const content = document.getElementById('modalbox-content');
+            if (content) content.innerHTML = '';
+        },
+        
+        openModal(url) {
+            this.modalPage = true;
+            this.returnUrl = window.location.pathname;
+            // HTMX will handle the content loading
         }
     }
-    
-    // Run on initial load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', updatePostpageAudio);
-    } else {
-        updatePostpageAudio();
-    }
-    
-    // HTMX swaps (open post, prev/next, explore tag changes, etc.)
-    document.body.addEventListener('htmx:afterSettle', updatePostpageAudio);
-    
-    // Modal open/close detection: watch ONLY #modalpage-content, not the entire DOM tree
-    const modalContent = document.getElementById('modalpage-content');
-    if (modalContent) {
-        const observer = new MutationObserver(() => updatePostpageAudio());
-        observer.observe(modalContent, { childList: true });
-    }
-})();
+}
+
+// Handle HTMX OOB errors gracefully
+document.addEventListener('htmx:oobErrorNoTarget', function(evt) {
+    // Silent ignore - this is expected for OOB swaps in modal context
+    evt.preventDefault();
+});
 
 // ======== HELPER: Convert plain string to UTF-8 hex with 0x prefix ========
 function utf8ToHex(str) {
@@ -199,6 +189,96 @@ function walletLogin() {
         }
     }
 }
+
+// Video player function for feed
+window.userWantsSound = false;
+window.currentlyPlayingVideo = null;
+
+function videoPlayer(src) {
+    return {
+        src,
+        playing: false,
+        muted: !window.userWantsSound,
+        userPaused: false,
+        ready: false,
+        showTapIcon: false,
+
+        init() {
+            const video = this.$refs.videoPlayer;
+            this.muted = !window.userWantsSound;
+            video.muted = this.muted;
+            this.observeVideo(video);
+            this.ready = true;
+        },
+
+        observeVideo(video) {
+            const observer = new IntersectionObserver(([entry]) => {
+                if (window.pauseAllVideosFlag) {
+                    video.pause();
+                    video.muted = true;
+                    return;
+                }
+
+                if (entry.isIntersecting && !this.userPaused) {
+                    if (window.currentlyPlayingVideo && window.currentlyPlayingVideo !== video) {
+                        window.currentlyPlayingVideo.pause();
+                    }
+                    window.currentlyPlayingVideo = video;
+                    video.play().catch(() => {});
+                } else if (!entry.isIntersecting) {
+                    if (window.currentlyPlayingVideo === video) {
+                        window.currentlyPlayingVideo = null;
+                    }
+                    video.pause();
+                }
+            }, { threshold: 0.6 });
+            observer.observe(video);
+        },
+
+        togglePlay() {
+            const video = this.$refs.videoPlayer;
+            if (video.paused) {
+                this.userPaused = false;
+                this.playing = true;
+                this.$nextTick(() => this.showTapIcon = true);
+                if (window.currentlyPlayingVideo && window.currentlyPlayingVideo !== video) {
+                    window.currentlyPlayingVideo.pause();
+                }
+                window.currentlyPlayingVideo = video;
+                video.play();
+            } else {
+                this.userPaused = true;
+                this.playing = false;
+                this.$nextTick(() => this.showTapIcon = true);
+                video.pause();
+                if (window.currentlyPlayingVideo === video) window.currentlyPlayingVideo = null;
+            };
+
+            this.$nextTick(() => {
+                this.showTapIcon = true;
+            });
+
+            setTimeout(() => {
+                this.showTapIcon = false;
+            }, 700); 
+        },
+
+        toggleMute() {
+            const video = this.$refs.videoPlayer;
+            this.muted = !this.muted;
+            video.muted = this.muted;
+            window.userWantsSound = !this.muted;
+        }
+    }
+}
+
+document.body.addEventListener('htmx:afterSwap', (e) => {
+    if (e.target.id !== 'modalpage-content') return;
+    document.querySelectorAll('video[x-ref="videoPlayer"]').forEach(video => {
+        video.muted = true;
+        video.load();
+    });
+});
 </script>
 
 </body>
