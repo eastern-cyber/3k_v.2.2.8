@@ -13,7 +13,7 @@
     </div>
     <div class="grow flex justify-between">
         <div>
-            <div class="font-medium">{% if comment.author %}{{ comment.author.username }}{% else %}Anonymous{% endif %}</div>
+            <div class="font-medium">{% if comment.author %}{{ comment.author.name }}{% else %}Anonymous{% endif %}</div>
             <div class="leading-5">{{ comment.body }}</div>
             <div class="flex gap-4 text-neutral-400 text-sm mt-1">
                 <span>{{ comment.created_at|timesince }} ago</span>
