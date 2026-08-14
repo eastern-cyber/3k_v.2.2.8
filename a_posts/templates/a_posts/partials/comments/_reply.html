@@ -13,11 +13,11 @@
     </div>
     <div class="grow flex justify-between">
         <div>
-            <div class="font-medium">{% if comment.author %}{{ comment.author.username }}{% else %}Anonymous{% endif %}</div>
+            <div class="font-medium">{% if comment.author %}{{ comment.author.name }}{% else %}Anonymous{% endif %}</div>
             <div class="leading-5">
                 {% if comment.parent_reply %}
                     <a href="{% url 'profile' comment.parent_reply.author.username %}" class="text-blue-600 hover:underline mr-1">
-                        @{{ comment.parent_reply.author.username }}
+                        @{{ comment.parent_reply.author.name }}
                     </a>
                 {% endif %}
                 {{ comment.body }}
