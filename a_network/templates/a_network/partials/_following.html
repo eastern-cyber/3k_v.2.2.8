@@ -8,13 +8,13 @@
             </div>
         {% else %}
             <div class="text-center font-medium text-neutral-400 text-sm py-12 lg:mr-60">
-                No accounts following
+                ยังไม่มีการติดตาม
             </div>
         {% endif %}
 
         {% if suggested_users %}
             <p class="font-medium text-neutral-400 text-sm pt-12 pb-4">
-                Suggested accounts
+                บัญชีผู้ใช้ที่แนะนำ
             </p>
             <div class="grid grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))] gap-4">
                 {% for this_user in suggested_users %}

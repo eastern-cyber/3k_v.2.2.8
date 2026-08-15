@@ -170,13 +170,22 @@
                                         <img src="{{ post.author.avatar }}" class="w-full h-full object-cover">
                                     </div>
                                     <div>
-                                        <div class="font-medium hover:underline">{{ post.author.username }}</div>
+                                        {% if post.author.username %}
+                                            {% with username=post.author.username %}
+                                                {% if username|length == 42 and username|slice:":2" == "0x" %}
+                                                    <span class="font-medium hover:underline">{{ username|slice:":6" }}...{{ username|slice:"-4:" }}</span>
+                                                    {% else %}
+                                                    <span class="font-medium hover:underline">{{ post.author.username }}</span>  
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endif %}
+                                        <!-- <div class="font-medium hover:underline">{{ post.author.username }}</div> -->
                                         <div class="text-sm -mt-0.5">
                                             {% if post.author.name %}
                                             <span>{{ post.author.name }}</span>
                                             <span class="mx-1"> · </span>
                                             {% endif %}
-                                            <span>{{ post.created_at|timesince }} ago</span>
+                                            <span>{{ post.created_at|timesince }} ที่ผ่านมา</span>
                                         </div>
                                     </div>
                                 </a>

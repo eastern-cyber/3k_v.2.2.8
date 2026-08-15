@@ -8,13 +8,13 @@
             </div>
         {% else %}
             <div class="text-center font-medium text-neutral-400 text-sm py-12 lg:mr-60">
-                Mutual follows become friends
+                หากกดติดตามผู้ที่ติดตามท่าน ผู้นั้นจะกลายเป็นเพื่อน
             </div>
         {% endif %}
 
         {% if suggested_friends %}
             <p class="font-medium text-neutral-400 text-sm pt-12 pb-4">
-                Your Followers
+                ผู้ที่ติดตามท่าน
             </p>
             <div class="grid grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))] gap-4">
                 {% for this_user in suggested_friends %}

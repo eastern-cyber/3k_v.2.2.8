@@ -4,11 +4,11 @@
         {% if not follow_clicked %}hx-swap="none"{% else %}hx-swap-oob="outerHTML"{% endif %}>
         {% if user|is_following:this_user %}
         <div class="bg-neutral-200/70 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 rounded-md px-7 py-2">
-            Following
+            ติดตามแล้ว
         </div>
         {% else %}
         <div class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
-            Follow
+            ติดตาม
         </div>
         {% endif %}
 </button>

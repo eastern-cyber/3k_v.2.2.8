@@ -1,5 +1,5 @@
 <div class="text-center font-medium text-xl py-1 mb-6">
-    {% if followers %}Followers{% else %}Following{% endif %}
+    {% if followers %}ผู้ติดตาม{% else %}การติดตาม{% endif %}
 </div>
 
 {% if accounts %}
@@ -26,9 +26,9 @@
 {% else %}
      <p class="flex items-center justify-center font-medium text-neutral-400 text-sm">
         {% if followers %}
-            No followers yet. Be the first one!
+            ยังไม่มีผู้ติดตาม. มาเป็นผู้ติดตามคนแรกกันเถอะ!
         {% else %}
-            No accounts following
+            ยังไม่มีการติดตาม
         {% endif %}
     </p>
 {% endif %}
