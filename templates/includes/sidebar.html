@@ -322,7 +322,7 @@
             <ul class="flex flex-col gap-1">
                 <li>
                     <button @click="resetAll(); showColorModes = true" class="button-rounded dark:hover:!bg-neutral-800">
-                        <span class="font-medium">โหมดกลางคืน</span>
+                        <span class="font-medium">ปรับโหมดแสง</span>
                         <div class="size-4 fill-neutral-400">
                             <svg viewBox="0 0 48 48">
                                 <path d="M28.74 24 15.08 10.33a1 1 0 0 1 0-1.41l1.84-1.84a1 1 0 0 1 1.41 0L34.54 23.3a1 1 0 0 1 0 1.42l-16.2 16.21a1 1 0 0 1-1.42 0l-1.84-1.84a1 1 0 0 1 0-1.41L28.74 24Z"></path>
@@ -354,33 +354,29 @@
                         </svg>
                     </div>
                 </button>
-                <h2 class="pl-3">Dark mode</h2>
+                <h2 class="pl-3">ปรับโหมดแสง</h2>
             </div>
             <ul class="flex flex-col gap-1">
                 <li>
-                    <button @click="darkMode = true" 
-                            hx-get="{% url 'a_users:settings' %}?darkmode=true"
-                            hx-swap="none"
+                    <button @click="darkMode = true; setDarkMode(true)" 
                             class="button-rounded dark:hover:!bg-neutral-800">
-                            <span class="font-medium">Dark mode</span>
-                            <div x-show="darkMode" class="size-3.5">
-                                <svg viewBox="0 0 48 48">
-                                    <path d="M43 6.08c.7.45 1.06.67 1.25.98.16.27.23.59.2.9-.03.36-.26.72-.7 1.43L23.06 42.14a3.5 3.5 0 0 1-5.63.39L4.89 27.62c-.54-.64-.81-.96-.9-1.32a1.5 1.5 0 0 1 .09-.92c.14-.33.46-.6 1.1-1.14l1.69-1.42c.64-.54.96-.81 1.31-.9.3-.06.63-.04.92.09.34.14.6.46 1.15 1.1l9.46 11.25 18.11-28.7c.45-.72.68-1.07.99-1.26.27-.16.59-.23.9-.2.36.03.71.25 1.43.7L43 6.08Z"></path>
-                                </svg>
-                            </div>
+                        <span class="font-medium">โหมดมืด</span>
+                        <div x-show="darkMode" class="size-3.5">
+                            <svg viewBox="0 0 48 48">
+                                <path d="M43 6.08c.7.45 1.06.67 1.25.98.16.27.23.59.2.9-.03.36-.26.72-.7 1.43L23.06 42.14a3.5 3.5 0 0 1-5.63.39L4.89 27.62c-.54-.64-.81-.96-.9-1.32a1.5 1.5 0 0 1 .09-.92c.14-.33.46-.6 1.1-1.14l1.69-1.42c.64-.54.96-.81 1.31-.9.3-.06.63-.04.92.09.34.14.6.46 1.15 1.1l9.46 11.25 18.11-28.7c.45-.72.68-1.07.99-1.26.27-.16.59-.23.9-.2.36.03.71.25 1.43.7L43 6.08Z"></path>
+                            </svg>
+                        </div>
                     </button>
                 </li>
                 <li>
-                    <button @click="darkMode = false" 
-                            hx-get="{% url 'a_users:settings' %}?darkmode=false"
-                            hx-swap="none"
+                    <button @click="darkMode = false; setDarkMode(false)" 
                             class="button-rounded dark:hover:!bg-neutral-800">
-                            <span class="font-medium">Light mode</span>
-                            <div x-show="!darkMode" class="size-3.5">
-                                <svg viewBox="0 0 48 48">
-                                    <path d="M43 6.08c.7.45 1.06.67 1.25.98.16.27.23.59.2.9-.03.36-.26.72-.7 1.43L23.06 42.14a3.5 3.5 0 0 1-5.63.39L4.89 27.62c-.54-.64-.81-.96-.9-1.32a1.5 1.5 0 0 1 .09-.92c.14-.33.46-.6 1.1-1.14l1.69-1.42c.64-.54.96-.81 1.31-.9.3-.06.63-.04.92.09.34.14.6.46 1.15 1.1l9.46 11.25 18.11-28.7c.45-.72.68-1.07.99-1.26.27-.16.59-.23.9-.2.36.03.71.25 1.43.7L43 6.08Z"></path>
-                                </svg>
-                            </div>
+                        <span class="font-medium">โหมดสว่าง</span>
+                        <div x-show="!darkMode" class="size-3.5">
+                            <svg viewBox="0 0 48 48">
+                                <path d="M43 6.08c.7.45 1.06.67 1.25.98.16.27.23.59.2.9-.03.36-.26.72-.7 1.43L23.06 42.14a3.5 3.5 0 0 1-5.63.39L4.89 27.62c-.54-.64-.81-.96-.9-1.32a1.5 1.5 0 0 1 .09-.92c.14-.33.46-.6 1.1-1.14l1.69-1.42c.64-.54.96-.81 1.31-.9.3-.06.63-.04.92.09.34.14.6.46 1.15 1.1l9.46 11.25 18.11-28.7c.45-.72.68-1.07.99-1.26.27-.16.59-.23.9-.2.36.03.71.25 1.43.7L43 6.08Z"></path>
+                            </svg>
+                        </div>
                     </button>
                 </li>
             </ul>
@@ -407,6 +403,31 @@
             showMessages: false,
             showMore: false,
             showColorModes: false,
+            darkMode: localStorage.getItem('darkMode') === 'true' || false,
+            init() {
+                // Apply dark mode on load
+                this.applyDarkMode(this.darkMode);
+            },
+            setDarkMode(value) {
+                this.darkMode = value;
+                localStorage.setItem('darkMode', value);
+                this.applyDarkMode(value);
+                
+                // Optionally, send to server without page reload
+                fetch(`{% url 'a_users:settings' %}?darkmode=${value}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            },
+            applyDarkMode(isDark) {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            },
             resetAll() {
                 this.showSearch = false;
                 this.showActivity = false;
@@ -414,6 +435,7 @@
                 this.showMore = false;
                 this.showColorModes = false;
             },
+
             closeMobileSidebar() {
                 if (window.innerWidth <= 768) {
                     const sidebarContainer = document.getElementById('sidebarContainer');

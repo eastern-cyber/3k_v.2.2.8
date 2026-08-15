@@ -18,7 +18,7 @@ h2 {
            border border-neutral-300 rounded-sm
            placeholder-neutral-400
            focus:border-neutral-400 focus:outline-hidden
-           dark:bg-neutral-800 dark:text-neutral-100
+           dark:bg-neutral-800 dark:text-neutral-200
            dark:border-neutral-600 dark:placeholder-neutral-500
            dark:focus:border-neutral-500;
 }
