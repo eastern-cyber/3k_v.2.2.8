@@ -1,4 +1,4 @@
-<div class="border-b border-neutral-200 pb-4">
+<div class="border-b border-neutral-200 dark:border-neutral-800 pb-4">
     <p class="font-medium text-2xl">
         แก้ไขโพรไฟล์
     </p>
@@ -7,7 +7,7 @@
 <form method="POST" action="{% url 'a_users:profile_edit' %}" enctype="multipart/form-data">
 {% csrf_token %}
 
-<div class="flex border-b border-neutral-200 py-4">
+<div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
     <div class="w-30 font-medium text-md">รูปโพรไฟล์</div>
     <div class="grow flex justify-center">
         <div x-data class="inline-block relative">
@@ -28,25 +28,33 @@
     <div class="w-0 sm:w-27"></div>
 </div>
 
-<div class="flex items-center border-b border-neutral-200 py-4">
-    <div class="w-30 font-medium text-md">ชื่อผู้ใช้</div>
-    <div class="grow">{{ form.username }}</div>
-    <div class="w-0 sm:w-27"></div>
+<div class="flex items-start border-b border-neutral-200 dark:border-neutral-800 py-4">
+    <div class="w-30 shrink-0 font-medium text-md px-2">
+        ชื่อผู้ใช้
+    </div>
+
+    <div class="grow min-w-0">
+        <div class="input-display min-w-0">
+            <span class="break-anywhere">{{ user.username }}</span>
+        </div>
+    </div>
+
+    <div class="w-0 sm:w-27 shrink-0"></div>
 </div>
 
-<div class="flex items-center border-b border-neutral-200 py-4">
+<div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
     <div class="w-30 font-medium text-md">ชื่อแสดง</div>
     <div class="grow">{{ form.name }}</div>
     <div class="w-0 sm:w-27"></div>
 </div>
 
-<div class="flex border-b border-neutral-200 py-4">
+<div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
     <div class="w-30 font-medium text-md shrink-0">รายละเอียด</div>
     <div class="grow">{{ form.bio }}</div>
     <div class="w-0 sm:w-27 shrink-0"></div>
 </div>
 
-<div class="flex items-center border-b border-neutral-200 py-4">
+<div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
     <div class="w-30 font-medium text-md">ลิ้งค์แนะนำ</div>
     <div class="grow">{{ form.website }}</div>
     <div class="w-0 sm:w-27"></div>
@@ -56,7 +64,10 @@
     <div class="ml-auto flex gap-4">
         <button type="button"
                 @click="modalBox = false; document.getElementById('modalbox-content').innerHTML = ''; "
-                class="bg-white hover:bg-neutral-100 border border-neutral-300 rounded-md px-7 py-2">
+                class="bg-white dark:bg-neutral-800
+                hover:bg-neutral-100 dark:hover:bg-neutral-700
+                border border-neutral-300 dark:border-neutral-600
+                rounded-md px-7 py-2">
                 ยกเลิก
         </button>
         <button type="submit" 

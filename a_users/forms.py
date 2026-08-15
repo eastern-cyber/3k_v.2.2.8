@@ -28,12 +28,22 @@ class CustomSignupForm(SignupForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['image', 'username', 'name', 'bio', 'website']
+        fields = ['image', 'name', 'bio', 'website']
         widgets = {
-            'username' : forms.TextInput(attrs={'class': 'input-field','placeholder': 'Username'}),
-            'name' : forms.TextInput(attrs={'class': 'input-field','placeholder': 'Name'}),
-            'bio' : forms.Textarea(attrs={'class': 'input-field resize-none','rows':2, 'placeholder': 'Bio', 'maxlength': '250'}),
-            'website' : forms.TextInput(attrs={'class': 'input-field','placeholder': 'Website'}),
+            'name': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Name',
+            }),
+            'bio': forms.Textarea(attrs={
+                'class': 'input-field resize-none',
+                'rows': 2,
+                'placeholder': 'Bio',
+                'maxlength': '250',
+            }),
+            'website': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Website',
+            }),
         }
         
         
