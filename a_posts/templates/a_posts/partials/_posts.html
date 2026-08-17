@@ -337,22 +337,25 @@
 {% endif %}
 
 <script>
-window.userWantsSound = false;
+// CHANGE 1: Set default to unmuted (true means sound ON)
+window.userWantsSound = true;
 window.currentlyPlayingVideo = null;
 
 function videoPlayer(src) {
     return {
         src,
         playing: false,
-        muted: !window.userWantsSound,
+        // CHANGE 2: Start unmuted (false means NOT muted)
+        muted: false,
         userPaused: false,
         ready: false,
         showTapIcon: false,
 
         init() {
             const video = this.$refs.videoPlayer;
-            this.muted = !window.userWantsSound;
-            video.muted = this.muted;
+            // CHANGE 3: Set muted to false (unmuted)
+            this.muted = false;
+            video.muted = false;
             this.observeVideo(video);
             this.ready = true;
         },
@@ -370,6 +373,8 @@ function videoPlayer(src) {
                         window.currentlyPlayingVideo.pause();
                     }
                     window.currentlyPlayingVideo = video;
+                    // CHANGE 4: Ensure video is unmuted when it starts playing
+                    video.muted = this.muted;
                     video.play().catch(() => {});
                 } else if (!entry.isIntersecting) {
                     if (window.currentlyPlayingVideo === video) {
@@ -391,6 +396,8 @@ function videoPlayer(src) {
                     window.currentlyPlayingVideo.pause();
                 }
                 window.currentlyPlayingVideo = video;
+                // CHANGE 5: Keep current mute state when playing
+                video.muted = this.muted;
                 video.play();
             } else {
                 this.userPaused = true;
@@ -421,7 +428,8 @@ function videoPlayer(src) {
 document.body.addEventListener('htmx:afterSwap', (e) => {
     if (e.target.id !== 'modalpage-content') return;
     document.querySelectorAll('video[x-ref="videoPlayer"]').forEach(video => {
-        video.muted = true;
+        // CHANGE 6: Don't force mute for modal videos
+        video.muted = false;
         video.load();
     });
 });
