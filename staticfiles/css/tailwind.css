@@ -14,7 +14,13 @@ h2 {
     @apply text-[1.2rem] font-bold
 }
 #account input, .input-field {
-    @apply bg-neutral-100 w-full px-3 py-2.5 border border-neutral-300 rounded-sm placeholder-neutral-400 focus:border-neutral-400 focus:outline-hidden 
+    @apply bg-neutral-100 text-neutral-800 w-full px-3 py-2.5
+           border border-neutral-300 rounded-sm
+           placeholder-neutral-400
+           focus:border-neutral-400 focus:outline-hidden
+           dark:bg-neutral-800 dark:text-neutral-200
+           dark:border-neutral-600 dark:placeholder-neutral-500
+           dark:focus:border-neutral-500;
 }
 #account button {
     @apply bg-rose-500 hover:bg-rose-600 text-white px-4 py-2.5 rounded-md font-medium mb-2
@@ -106,4 +112,13 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .play-button-anim {
     animation: playbuttonanim 0.7s ease-out forwards;
+}
+.input-display {
+    @apply bg-neutral-100 text-neutral-800 w-full px-3 py-2.5
+           border border-neutral-300 rounded-sm
+           dark:bg-neutral-800 dark:text-neutral-100
+           dark:border-neutral-600;
+}
+.break-anywhere {
+    overflow-wrap: anywhere;
 }
