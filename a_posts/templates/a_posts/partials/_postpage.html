@@ -80,8 +80,7 @@
                 src="{{ post.video.url }}"
                 class="object-contain w-full h-full"
                 controls 
-                autoplay 
-
+                muted 
                 loop 
                 playsinline>
             </video>
@@ -321,7 +320,7 @@
                             <a href="{% url 'post_page' post_item.uuid %}">
                                 <div class="relative bg-black w-full aspect-[3/4] rounded-lg overflow-hidden">
                                     {% if post_item.video %}
-                                        <video class="w-full h-full object-cover" src="{{ post_item.video.url }}" autoplay muted loop playsinline></video>
+                                        <video class="w-full h-full object-cover" src="{{ post_item.video.url }}" muted loop playsinline></video>
                                     {% elif post_item.image %}
                                         <img class="w-full h-full object-cover" src="{{ post_item.image.url }}">
                                     {% endif %}
