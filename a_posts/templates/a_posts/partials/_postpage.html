@@ -5,6 +5,11 @@
     button.absolute.top-4.left-4.bg-black\/20.p-3.rounded-full.z-20 {
         display: none !important;
     }
+    
+    /* Style for the unmute button in post page */
+    #postpage-content .unmute-button {
+        display: flex !important;
+    }
 </style>
 
 <div id="postpage-content" 
@@ -15,6 +20,7 @@
          startSplit: 50,
          containerHeight: 0,
          isMobile: window.innerWidth < 1024,
+         isSoundEnabled: false,
          
          init() {
              const saved = localStorage.getItem('postpage_split');
@@ -22,6 +28,8 @@
              window.addEventListener('resize', () => {
                  this.isMobile = window.innerWidth < 1024;
              });
+             // Check if user wants sound from the global setting
+             this.isSoundEnabled = window.userWantsSound || false;
          },
          
          startResize(e) {
@@ -59,6 +67,15 @@
          
          get rightStyle() {
              return this.isMobile ? `height: ${100 - this.split}%` : '';
+         },
+         
+         toggleSound() {
+             this.isSoundEnabled = !this.isSoundEnabled;
+             const video = document.getElementById('main-video-{{ post.uuid }}');
+             if (video) {
+                 video.muted = !this.isSoundEnabled;
+                 window.userWantsSound = this.isSoundEnabled;
+             }
          }
      }"
      x-init="init()"
@@ -83,11 +100,46 @@
                 controls 
                 muted 
                 loop 
-                playsinline>
+                playsinline
+                x-init="
+                    const video = $el;
+                    // Start muted by default in post page
+                    video.muted = true;
+                    // Only unmute if user explicitly wants sound
+                    if (window.userWantsSound) {
+                        video.muted = false;
+                        video.play();
+                    }
+                    // Listen for user interaction with controls
+                    video.addEventListener('play', function() {
+                        if (!this.muted && !window.userWantsSound) {
+                            window.userWantsSound = true;
+                            document.querySelector('#postpage-content')?.__x?.$data?.toggleSound?.();
+                        }
+                    });
+                ">
             </video>
         {% elif post.image %}
             <img src="{{ post.image.url }}" class="object-contain w-full h-full">
         {% endif %}
+        
+        <!-- Sound toggle button for post page -->
+        <button @click="toggleSound()" 
+                class="absolute bottom-24 left-4 z-20 bg-black/50 p-3 rounded-full hover:bg-black/70 transition-colors">
+            <div class="size-6 fill-white">
+                <div x-show="!isSoundEnabled">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M3 19v11.17a3 3 0 0 0 3 3h4.2a2 2 0 0 1 1.46.63l8.88 9.5A2 2 0 0 0 24 41.93V6.4a2 2 0 0 0-3.51-1.3L11.67 15.3a2 2 0 0 1-1.52.7H6a3 3 0 0 0-3 3ZM29.3 18.12 35.16 24l-5.88 5.88a1 1 0 0 0 0 1.41l1.42 1.42a1 1 0 0 0 1.41 0L38 26.83l5.88 5.88a1 1 0 0 0 1.41 0l1.42-1.42a1 1 0 0 0 0-1.41L40.83 24l5.88-5.88a1 1 0 0 0 0-1.41l-1.42-1.42a1 1 0 0 0-1.41 0L38 21.17l-5.88-5.88a1 1 0 0 0-1.41 0l-1.42 1.42a1 1 0 0 0 0 1.41Z"></path>
+                    </svg>
+                </div>
+                <div x-show="isSoundEnabled">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M7 16a3 3 0 0 0-3 3v11.17a3 3 0 0 0 3 3h4.2a2 2 0 0 1 1.46.63l8.88 9.5A2 2 0 0 0 25 41.93V6.4a2 2 0 0 0-3.51-1.3L12.67 15.3a2 2 0 0 1-1.52.7H7ZM37.43 37.44a1.04 1.04 0 0 1-.02-1.44 18.17 18.17 0 0 0 0-24 1.04 1.04 0 0 1 .02-1.43l1.42-1.42a.97.97 0 0 1 1.4.02 22.2 22.2 0 0 1 0 29.66c-.38.41-1.01.41-1.4.02l-1.42-1.41Z"></path><path d="M31.03 18.38a1.1 1.1 0 0 1 .04-1.45l1.41-1.42a.94.94 0 0 1 1.39.03 13.12 13.12 0 0 1 0 16.92.94.94 0 0 1-1.39.03l-1.41-1.42a1.1 1.1 0 0 1-.04-1.45c2.6-3.24 2.6-8 0-11.24Z"></path>
+                    </svg>
+                </div>
+            </div>
+        </button>
+        
         <scroll-bar class="absolute right-5 top-0 h-full flex items-center z-10">
             <div class="flex flex-col gap-4">
                 {% if prev_post %}
@@ -179,7 +231,6 @@
                                                 {% endif %}
                                             {% endwith %}
                                         {% endif %}
-                                        <!-- <div class="font-medium hover:underline">{{ post.author.username }}</div> -->
                                         <div class="text-sm -mt-0.5">
                                             {% if post.author.name %}
                                             <span>{{ post.author.name }}</span>
