@@ -363,6 +363,12 @@ function videoPlayer(src) {
 
         observeVideo(video) {
             const observer = new IntersectionObserver(([entry]) => {
+                // CRITICAL: Check if modal is open - if so, don't play
+                if (window.modalPageOpen) {
+                    video.pause();
+                    return;
+                }
+                
                 if (window.pauseAllVideosFlag) {
                     video.pause();
                     video.muted = true;
@@ -426,12 +432,15 @@ function videoPlayer(src) {
     }
 }
 
+// Override the document event handler to NOT force unmute on modal videos
+// The original handler in base.html will handle this
+// We need to remove the handler from _posts.html that was forcing unmute
 document.body.addEventListener('htmx:afterSwap', (e) => {
-    if (e.target.id !== 'modalpage-content') return;
-    document.querySelectorAll('video[x-ref="videoPlayer"]').forEach(video => {
-        // CHANGE 6: Don't force mute for modal videos
-        video.muted = false;
-        video.load();
-    });
+    // Only handle feed videos when modal is NOT open
+    if (e.target.id === 'modalpage-content') {
+        // When modal opens, feed videos are already handled by base.html
+        // Don't do anything here that would conflict
+        return;
+    }
 });
 </script>

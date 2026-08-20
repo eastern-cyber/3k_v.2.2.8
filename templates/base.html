@@ -1,3 +1,4 @@
+<!-- templates/base.html -->
 {% load static %}
 {% load django_htmx %}
 <!DOCTYPE html>
@@ -55,9 +56,16 @@ function mainApp() {
                 if (!value) {
                     const content = document.getElementById('modalpage-content');
                     if (content) content.innerHTML = '';
+                    // Restore feed videos when modal closes
+                    this.restoreFeedVideos();
                 }
                 // Toggle body scroll
                 document.body.style.overflow = value ? 'hidden' : '';
+                
+                // Pause feed videos when modal opens
+                if (value) {
+                    this.pauseFeedVideos();
+                }
             });
             
             this.$watch('modalBox', (value) => {
@@ -65,6 +73,38 @@ function mainApp() {
                     const content = document.getElementById('modalbox-content');
                     if (content) content.innerHTML = '';
                 }
+            });
+        },
+        
+        pauseFeedVideos() {
+            // Pause all feed videos and store their state
+            document.querySelectorAll('article video[x-ref="videoPlayer"]').forEach(video => {
+                if (!video.paused) {
+                    video.dataset.wasPlaying = 'true';
+                    video.pause();
+                } else {
+                    video.dataset.wasPlaying = 'false';
+                }
+                // Also mute them to prevent audio bleeding
+                video.dataset.wasMuted = video.muted;
+                video.muted = true;
+            });
+        },
+        
+        restoreFeedVideos() {
+            // Restore feed videos to their previous state
+            document.querySelectorAll('article video[x-ref="videoPlayer"]').forEach(video => {
+                // Restore mute state
+                if (video.dataset.wasMuted !== undefined) {
+                    video.muted = video.dataset.wasMuted === 'true';
+                }
+                // Restore play state if it was playing
+                if (video.dataset.wasPlaying === 'true') {
+                    video.play().catch(() => {});
+                }
+                // Clean up dataset attributes
+                delete video.dataset.wasPlaying;
+                delete video.dataset.wasMuted;
             });
         },
         
@@ -190,29 +230,37 @@ function walletLogin() {
     }
 }
 
-// Video player function for feed
-window.userWantsSound = false;
+// ========== VIDEO PLAYER - Feed specific ==========
+// This is the global setting for feed videos (unmuted by default)
+window.userWantsSound = true; // Changed to true for feed videos
 window.currentlyPlayingVideo = null;
 
 function videoPlayer(src) {
     return {
         src,
         playing: false,
-        muted: !window.userWantsSound,
+        // Feed videos start unmuted (false = NOT muted)
+        muted: false,
         userPaused: false,
         ready: false,
         showTapIcon: false,
 
         init() {
             const video = this.$refs.videoPlayer;
-            this.muted = !window.userWantsSound;
-            video.muted = this.muted;
+            // Feed videos unmuted by default
+            this.muted = false;
+            video.muted = false;
             this.observeVideo(video);
             this.ready = true;
         },
 
         observeVideo(video) {
             const observer = new IntersectionObserver(([entry]) => {
+                // Don't autoplay if modal is open
+                if (window.modalPageOpen) {
+                    return;
+                }
+                
                 if (window.pauseAllVideosFlag) {
                     video.pause();
                     video.muted = true;
@@ -224,6 +272,8 @@ function videoPlayer(src) {
                         window.currentlyPlayingVideo.pause();
                     }
                     window.currentlyPlayingVideo = video;
+                    // Keep feed videos unmuted when playing
+                    video.muted = this.muted;
                     video.play().catch(() => {});
                 } else if (!entry.isIntersecting) {
                     if (window.currentlyPlayingVideo === video) {
@@ -245,6 +295,7 @@ function videoPlayer(src) {
                     window.currentlyPlayingVideo.pause();
                 }
                 window.currentlyPlayingVideo = video;
+                video.muted = this.muted;
                 video.play();
             } else {
                 this.userPaused = true;
@@ -272,12 +323,54 @@ function videoPlayer(src) {
     }
 }
 
+// Track modal state globally
+window.modalPageOpen = false;
+
+// HTMX event handler for modal content
 document.body.addEventListener('htmx:afterSwap', (e) => {
-    if (e.target.id !== 'modalpage-content') return;
-    document.querySelectorAll('video[x-ref="videoPlayer"]').forEach(video => {
-        video.muted = true;
-        video.load();
-    });
+    if (e.target.id === 'modalpage-content') {
+        // Modal is now open
+        window.modalPageOpen = true;
+        
+        // Force all feed videos to pause and mute
+        document.querySelectorAll('article video[x-ref="videoPlayer"]').forEach(video => {
+            if (!video.paused) {
+                video.dataset.wasPlaying = 'true';
+                video.pause();
+            } else {
+                video.dataset.wasPlaying = 'false';
+            }
+            video.dataset.wasMuted = video.muted;
+            video.muted = true;
+        });
+    }
+});
+
+// Also handle when modal content is removed (modal closed)
+document.addEventListener('htmx:beforeSwap', (e) => {
+    if (e.detail.target && e.detail.target.id === 'modalpage-content' && !e.detail.target.innerHTML) {
+        // Modal is closing
+        window.modalPageOpen = false;
+        
+        // Restore feed videos
+        document.querySelectorAll('article video[x-ref="videoPlayer"]').forEach(video => {
+            if (video.dataset.wasMuted !== undefined) {
+                video.muted = video.dataset.wasMuted === 'true';
+            }
+            if (video.dataset.wasPlaying === 'true') {
+                video.play().catch(() => {});
+            }
+            delete video.dataset.wasPlaying;
+            delete video.dataset.wasMuted;
+        });
+    }
+});
+
+// Clean up modal state when using close button
+document.addEventListener('click', (e) => {
+    if (e.target.closest('[x-data="mainApp()"]') && e.target.closest('[x-data="mainApp()"]').__x?.$data?.modalPage === false) {
+        window.modalPageOpen = false;
+    }
 });
 </script>
 
