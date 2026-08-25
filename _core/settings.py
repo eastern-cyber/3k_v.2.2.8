@@ -1,3 +1,4 @@
+# _core/settings.py
 """
 Django settings for _core project.
 

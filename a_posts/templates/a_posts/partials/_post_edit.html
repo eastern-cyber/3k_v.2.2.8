@@ -1,6 +1,7 @@
+<!-- a_posts/templates/a_posts/partials/_post_edit.html -->
 <div class="border-b border-neutral-200 pb-4">
     <p class="font-medium text-2xl">
-        Edit Post
+        แก้ไขหรือลบโพสต์
     </p>
 </div>
 
@@ -8,21 +9,31 @@
     <form method="post" action="{% url 'post_edit' post.uuid %}">
         {% csrf_token %}
         <div class="py-2">
-            <label class="block font-bold text-neutral-600 pb-1">Caption</label>
+            <label class="block font-bold text-neutral-600 pb-1">แค๊ปชั่น</label>
             {{ form.body }}
         </div>
         <div class="py-2">
-            <label class="block font-bold text-neutral-600 pb-1">Hashtags</label>
+            <label class="block font-bold text-neutral-600 pb-1">แฮ็ชแท็ก</label>
             {{ form.tags }}
+        </div>
+        <div class="py-2">
+            <label class="block font-bold text-neutral-600">ลิ้งค์ภายนอก (URL)</label>
+            {{ form.link_url }}
+            <p class="text-xs text-neutral-500 mt-1">แก้ไขหรือลบ URL เพื่อเปลี่ยนลิ้งค์</p>
+        </div>
+        <div class="py-2">
+            <label class="block font-bold text-neutral-600">คำอธิบาย (Option)</label>
+            {{ form.link_title }}
+            <p class="text-xs text-neutral-500 mt-1">คำอธิบายลิ้งค์ URL (ไม่เกิน 100 ตัวอักษร)</p>
         </div>
         <div class="mt-2 flex justify-end">
             <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2 font-medium">
-                Change
+                แก้ไข
             </button>
         </div>
     </form>
 </div>
 
 <div class="pt-8 pb-4 text-center">
-    <a href="{% url 'post_edit' post.uuid %}?delete=true" class="font-medium text-red-600 hover:underline">Delete Post</a>
+    <a href="{% url 'post_edit' post.uuid %}?delete=true" class="font-medium text-red-600 hover:underline">ลบโพสต์</a>
 </div>

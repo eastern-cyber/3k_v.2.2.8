@@ -1,3 +1,4 @@
+# a_posts/models.py
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
@@ -22,6 +23,8 @@ class Post(models.Model):
     video = models.FileField(upload_to='posts/videos/', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='posts/thumbnails/', null=True, blank=True)
     body = models.CharField(max_length=80, null=True, blank=True)
+    link_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="External Link")
+    link_title = models.CharField(max_length=100, blank=True, null=True, verbose_name="Link Title/Caption")
     tags = models.ManyToManyField('Tag', related_name='posts', blank=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="likedposts", through="LikedPost")
     bookmarks = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="bookmarkedposts", through="BookmarkedPost")

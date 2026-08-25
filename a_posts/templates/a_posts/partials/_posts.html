@@ -1,5 +1,6 @@
 <!-- a_posts/templates/a_posts/partials/_posts.html -->
 {% load static %}
+{% load post_filters %}
 
 <style>
 /* Mobile full-screen fix - keeps all original functionality */
@@ -227,19 +228,62 @@
         {% endif %}
 
         <article-info class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
-            <div class="absolute bottom-0 p-5 text-white z-10">
-                {% if post.author %}
-                <a href="{% url 'profile' post.author.username %}" class="hover:underline pointer-events-auto">{{ post.author.name }}</a>
-                {% endif %}
-                {% if post.tags.exists %}
-                <div class="mt-1">
-                    {% for tag in post.tags.all %}
-                    <a href="{% url 'search' %}?q={{ tag.name }}" class="hover:underline pointer-events-auto mr-2">{{ tag }}</a>
-                    {% endfor %}
+            <!-- Dark background container -->
+            <div class="absolute bottom-0 left-0 right-0 z-10 rounded-b-2xl overflow-hidden"
+                style="background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.5) 60%, transparent 100%); 
+                        max-width: 100%; width: 100%;">
+                
+                <div class="p-4 sm:p-5 text-white" 
+                    style="max-width: 100%; overflow: hidden; word-break: break-word;">
+                    <div class="space-y-0.5" style="max-width: 100%; overflow: hidden;">
+                        
+                        {% if post.author %}
+                        <a href="{% url 'profile' post.author.username %}" 
+                        class="hover:underline pointer-events-auto font-medium text-white text-sm sm:text-base"
+                        style="display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ post.author.name }}
+                        </a>
+                        {% endif %}
+                        
+                        {% if post.link_url %}
+                        <div class="mt-0.5" style="max-width: 100%; overflow: hidden;">
+                            <a href="{{ post.link_url }}" target="_blank" rel="noopener noreferrer" 
+                            class="inline-flex items-center gap-1 text-blue-300 hover:text-blue-200 hover:underline pointer-events-auto transition-colors text-sm"
+                            style="max-width: 100%; overflow: hidden;">
+                                <span style="max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                    {% if post.link_title %}
+                                        {{ post.link_title }}
+                                    {% else %}
+                                        {{ post.link_url|clean_url }}
+                                    {% endif %}
+                                </span>
+                                <span class="text-xs opacity-60 flex-shrink-0" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">↗</span>
+                            </a>
+                            {% if post.link_title %}
+                            <div class="text-xs text-blue-300/70 mt-0.5"
+                                style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                {{ post.link_url|clean_url }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if post.tags.exists %}
+                        <div class="mt-0.5 flex flex-wrap gap-1" style="max-width: 100%;">
+                            {% for tag in post.tags.all %}
+                            <a href="{% url 'search' %}?q={{ tag.name }}" 
+                            class="hover:underline pointer-events-auto text-xs sm:text-sm text-white/90"
+                            style="max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                {{ tag }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
             </div>
-            <div class="h-64 w-full bg-gradient-to-t from-black to-transparent opacity-30 rounded-b-2xl"></div>
+            <!-- Gradient overlay -->
+            <div class="h-48 w-full bg-gradient-to-t from-black/60 to-transparent rounded-b-2xl pointer-events-none"></div>
         </article-info>
 
         <article-buttons class="absolute -right-17 bottom-0 flex flex-col gap-2">

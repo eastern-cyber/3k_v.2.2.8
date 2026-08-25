@@ -1,3 +1,4 @@
+# a_posts/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -97,6 +98,10 @@ def upload_view(request):
             post = form.save(commit=False)
             post.author = request.user
             
+            # Handle link_url and link_title
+            post.link_url = form.cleaned_data.get('link_url')
+            post.link_title = form.cleaned_data.get('link_title')
+            
             uploaded_file = form.cleaned_data.get('file')  
             
             if uploaded_file:
@@ -180,7 +185,7 @@ def post_page_view(request, pk=None):
         'next_post': next_post,
         'user_authenticated': request.user.is_authenticated,
         'is_crawler': False,
-        'disable_oob': True,   # <--- ADD THIS LINE
+        'disable_oob': True,
     }
     
     if request.htmx:
@@ -199,7 +204,13 @@ def post_edit(request, pk):
     if request.method == 'POST':
         form = PostEditForm(request.POST, instance=post)
         if form.is_valid():
-            post = form.save()
+            post = form.save(commit=False)
+            
+            # Handle link_url and link_title
+            post.link_url = form.cleaned_data.get('link_url')
+            post.link_title = form.cleaned_data.get('link_title')
+            
+            post.save()
             input_tags = form.cleaned_data.get('tags', '') 
             process_tags(post, input_tags)
             return redirect('post_page', pk)
