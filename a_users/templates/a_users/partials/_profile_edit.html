@@ -1,96 +1,108 @@
-<div class="border-b border-neutral-200 dark:border-neutral-800 pb-4">
-    <p class="font-medium text-2xl">
-        แก้ไขโพรไฟล์
-    </p>
-</div>
+<!-- a_users/templates/a_users/partials/_profile_edit.html -->
 
-<form method="POST" action="{% url 'a_users:profile_edit' %}" enctype="multipart/form-data">
-{% csrf_token %}
+<div class="flex flex-col h-full">
+    <!-- Header -->
+    <div class="border-b border-neutral-200 dark:border-neutral-800 pb-4 flex-shrink-0">
+        <p class="font-medium text-2xl">
+            แก้ไขโพรไฟล์
+        </p>
+    </div>
 
-<div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
-    <div class="w-30 font-medium text-md">รูปโพรไฟล์</div>
-    <div class="grow flex justify-center">
-        <div x-data class="inline-block relative">
-            <img id="avatar" class="h-32 w-32 rounded-full object-cover" src="{{ user.avatar }}" />
-            <button type="button"
-                    @click="$refs.avatarUpload.click()" 
-                    class="size-10 absolute bottom-0 right-0 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition duration-300 border-2 border-neutral-300">
-                    <div class="size-6">
-                        <svg viewBox="0 0 48 48" fill="currentColor" >
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M26.5858 5.08579C27.3479 4.32371 28.5767 4.30253 29.3646 5.03789L36.8646 12.0379C37.2612 12.408 37.4904 12.9232 37.4997 13.4655C37.5091 14.0078 37.2977 14.5307 36.9142 14.9142L16.9142 34.9142C16.5391 35.2893 16.0304 35.5 15.5 35.5H8.5C7.39543 35.5 6.5 34.6046 6.5 33.5V26C6.5 25.4696 6.71071 24.9609 7.08579 24.5858L26.5858 5.08579ZM28.0479 9.2805L10.5 26.8284V31.5H14.6716L32.622 13.5496L28.0479 9.2805Z"></path>
-                            <path d="M7 41C7 40.4477 7.44772 40 8 40H41C41.5523 40 42 40.4477 42 41V43C42 43.5523 41.5523 44 41 44H8C7.44772 44 7 43.5523 7 43V41Z"></path>
-                        </svg>
+    <form method="POST" 
+          action="{% url 'a_users:profile_edit' %}" 
+          enctype="multipart/form-data"
+          class="flex-1 flex flex-col min-h-0">
+    {% csrf_token %}
+
+        <!-- Scrollable content -->
+        <div class="flex-1 overflow-y-auto hide-scrollbar" style="min-height: 0;">
+            <div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
+                <div class="w-30 font-medium text-md">รูปโพรไฟล์</div>
+                <div class="grow flex justify-center">
+                    <div x-data class="inline-block relative">
+                        <img id="avatar" class="h-32 w-32 rounded-full object-cover" src="{{ user.avatar }}" />
+                        <button type="button"
+                                @click="$refs.avatarUpload.click()" 
+                                class="size-10 absolute bottom-0 right-0 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition duration-300 border-2 border-neutral-300">
+                                <div class="size-6">
+                                    <svg viewBox="0 0 48 48" fill="currentColor" >
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M26.5858 5.08579C27.3479 4.32371 28.5767 4.30253 29.3646 5.03789L36.8646 12.0379C37.2612 12.408 37.4904 12.9232 37.4997 13.4655C37.5091 14.0078 37.2977 14.5307 36.9142 14.9142L16.9142 34.9142C16.5391 35.2893 16.0304 35.5 15.5 35.5H8.5C7.39543 35.5 6.5 34.6046 6.5 33.5V26C6.5 25.4696 6.71071 24.9609 7.08579 24.5858L26.5858 5.08579ZM28.0479 9.2805L10.5 26.8284V31.5H14.6716L32.622 13.5496L28.0479 9.2805Z"></path>
+                                        <path d="M7 41C7 40.4477 7.44772 40 8 40H41C41.5523 40 42 40.4477 42 41V43C42 43.5523 41.5523 44 41 44H8C7.44772 44 7 43.5523 7 43V41Z"></path>
+                                    </svg>
+                                </div>
+                        </button>
+                        <input id="avatar_upload" class="hidden" name="image" type="file" accept="image/*" x-ref="avatarUpload" />
+                    </div>     
+                </div>
+                <div class="w-0 sm:w-27"></div>
+            </div>
+
+            <div class="flex items-start border-b border-neutral-200 dark:border-neutral-800 py-4">
+                <div class="w-30 shrink-0 font-medium text-md px-2">
+                    ชื่อผู้ใช้
+                </div>
+
+                <div class="grow min-w-0">
+                    <div class="input-display min-w-0">
+                        <span class="break-anywhere">{{ user.username }}</span>
                     </div>
-            </button>
-            <input id="avatar_upload" class="hidden" name="image" type="file" accept="image/*" x-ref="avatarUpload" />
-        </div>     
-    </div>
-    <div class="w-0 sm:w-27"></div>
-</div>
+                </div>
 
-<div class="flex items-start border-b border-neutral-200 dark:border-neutral-800 py-4">
-    <div class="w-30 shrink-0 font-medium text-md px-2">
-        ชื่อผู้ใช้
-    </div>
+                <div class="w-0 sm:w-27 shrink-0"></div>
+            </div>
 
-    <div class="grow min-w-0">
-        <div class="input-display min-w-0">
-            <span class="break-anywhere">{{ user.username }}</span>
+            <div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
+                <div class="w-30 font-medium text-md">ชื่อแสดง</div>
+                <div class="grow">{{ form.name }}</div>
+                <div class="w-0 sm:w-27"></div>
+            </div>
+
+            <div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
+                <div class="w-30 font-medium text-md shrink-0">รายละเอียด</div>
+                <div class="grow">{{ form.bio }}</div>
+                <div class="w-0 sm:w-27 shrink-0"></div>
+            </div>
+
+            <div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
+                <div class="w-30 font-medium text-md">ลิ้งค์แนะนำ</div>
+                <div class="grow">{{ form.website }}</div>
+                <div class="w-0 sm:w-27"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="w-0 sm:w-27 shrink-0"></div>
+        <!-- Sticky buttons at bottom -->
+        <div class="flex-shrink-0 bg-white dark:bg-neutral-900 pt-4 pb-2 border-t border-neutral-200 dark:border-neutral-800 flex">
+            <div class="ml-auto flex gap-4">
+                <button type="button"
+                        @click="modalBox = false; document.getElementById('modalbox-content').innerHTML = ''; "
+                        class="bg-white dark:bg-neutral-800
+                        hover:bg-neutral-100 dark:hover:bg-neutral-700
+                        border border-neutral-300 dark:border-neutral-600
+                        rounded-md px-7 py-2">
+                        ยกเลิก
+                </button>
+                <button type="submit" 
+                        class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
+                        บันทึก
+                </button>
+            </div>
+        </div>
+
+    </form>
 </div>
-
-<div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
-    <div class="w-30 font-medium text-md">ชื่อแสดง</div>
-    <div class="grow">{{ form.name }}</div>
-    <div class="w-0 sm:w-27"></div>
-</div>
-
-<div class="flex border-b border-neutral-200 dark:border-neutral-800 py-4">
-    <div class="w-30 font-medium text-md shrink-0">รายละเอียด</div>
-    <div class="grow">{{ form.bio }}</div>
-    <div class="w-0 sm:w-27 shrink-0"></div>
-</div>
-
-<div class="flex items-center border-b border-neutral-200 dark:border-neutral-800 py-4">
-    <div class="w-30 font-medium text-md">ลิ้งค์แนะนำ</div>
-    <div class="grow">{{ form.website }}</div>
-    <div class="w-0 sm:w-27"></div>
-</div>
-
-<div class="flex pt-4">
-    <div class="ml-auto flex gap-4">
-        <button type="button"
-                @click="modalBox = false; document.getElementById('modalbox-content').innerHTML = ''; "
-                class="bg-white dark:bg-neutral-800
-                hover:bg-neutral-100 dark:hover:bg-neutral-700
-                border border-neutral-300 dark:border-neutral-600
-                rounded-md px-7 py-2">
-                ยกเลิก
-        </button>
-        <button type="submit" 
-                class="bg-rose-500 hover:bg-rose-600 text-white rounded-md px-7 py-2">
-                บันทึก
-        </button>
-    </div>
-</div>
-
-</form>
 
 <script>
-
     // Update the avatar
     const fileInput = document.getElementById('avatar_upload');
     const image = document.getElementById('avatar');
 
-    fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file && file.type.includes('image')) {
-            const url = URL.createObjectURL(file);
-            image.src = url;
-        }
-    });
-
+    if (fileInput) {
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && file.type.includes('image')) {
+                const url = URL.createObjectURL(file);
+                image.src = url;
+            }
+        });
+    }
 </script>

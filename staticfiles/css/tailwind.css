@@ -122,3 +122,39 @@ input[type="search"]::-webkit-search-cancel-button {
 .break-anywhere {
     overflow-wrap: anywhere;
 }
+
+/* Add to your tailwind.css file */
+
+/* Modal scrolling styles */
+.modal-overlay {
+    overscroll-behavior: contain;
+}
+
+.modal-container {
+    max-height: 85vh;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* Ensure form doesn't overflow */
+.modal-form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make sure the scrollable area works */
+.modal-scrollable {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0; /* Important for flex children to scroll */
+}
+
+/* Sticky bottom buttons */
+.modal-footer {
+    flex-shrink: 0;
+    background: inherit;
+}
