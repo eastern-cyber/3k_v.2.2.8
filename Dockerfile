@@ -30,5 +30,7 @@ RUN npm run minify && python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-# Daphne (ASGI)
-CMD sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p $PORT _core.asgi:application"
+# Fixed: Use JSON array format for CMD (fixes the JSONArgsRecommended warning)
+# Fixed: Use PORT environment variable with default fallback
+# Fixed: Proper shell command with PORT variable expansion
+CMD ["sh", "-c", "python manage.py migrate && daphne -b 0.0.0.0 -p ${PORT:-8000} _core.asgi:application"]
