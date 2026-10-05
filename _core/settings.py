@@ -24,6 +24,7 @@ DEBUG = ENVIRONMENT == 'development'
 
 # Allow all hosts initially (update with your Railway domain later)
 ALLOWED_HOSTS = [
+    'v223.3kok.app',
     'v226.3kok.app',
     'v227.3kok.app',
     'v228.3kok.app',
@@ -40,6 +41,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://v223.3kok.app',
     'https://v226.3kok.app',
     'https://v227.3kok.app',
     'https://v228.3kok.app',
