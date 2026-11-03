@@ -10,9 +10,19 @@
                     {% if profile_user.username %}
                         {% with username=profile_user.username %}
                             {% if username|length == 42 and username|slice:":2" == "0x" %}
-                                <span class="text-2xl font-bold">{{ username|slice:":6" }}...{{ username|slice:"-4:" }}</span>
-                                {% else %}
-                                <span class="text-2xl font-bold">{{ profile_user.username }}</span>  
+                                <a href="https://www.dfi.fund/member-area/check-user?referrerId={{ username }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="hover:underline">
+                                    <span class="text-2xl font-bold">{{ username|slice:":6" }}...{{ username|slice:"-4:" }}</span>
+                                </a>
+                            {% else %}
+                                <a href="https://www.dfi.fund/member-area/check-user?referrerId={{ username }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="hover:underline">
+                                    <span class="text-2xl font-bold">{{ profile_user.username }}</span>
+                                </a>
                             {% endif %}
                         {% endwith %}
                     {% endif %}
