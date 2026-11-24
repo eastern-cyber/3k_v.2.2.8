@@ -1,4 +1,7 @@
+# a_users/urls.py
+
 from django.urls import path
+from . import views
 from .views import (
     profile_view, profile_edit, verification_code, 
     settings_view, delete_account,
@@ -17,4 +20,7 @@ urlpatterns = [
     # Password Reset with OTP
     path('password-reset/', password_reset_request, name='password_reset_request'),
     path('password-reset/verify/', password_reset_verify, name='password_reset_verify'),
+    
+    # DProject Users Details
+    path("user/<str:username>/", views.user_detail_view, name="user_detail"),
 ]

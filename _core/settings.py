@@ -199,7 +199,11 @@ CHANNEL_LAYERS = {
     }
 }
 
-# Database
+# ------------------------------------------------------------------
+# Databases
+# ------------------------------------------------------------------
+# Primary app DB (unchanged). Uses DATABASE_URL in production,
+# SQLite locally.
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
@@ -215,6 +219,21 @@ else:
         }
     }
 
+# ------------------------------------------------------------------
+# Secondary read-only DB (members table, e.g. Neon "neondb")
+# ------------------------------------------------------------------
+# Only add it when SECONDARY_DATABASE_URL is present AND differs
+# from DATABASE_URL. This avoids duplicate work when both point to
+# the same database.
+SECONDARY_DATABASE_URL = os.environ.get("SECONDARY_DATABASE_URL")
+
+if SECONDARY_DATABASE_URL and SECONDARY_DATABASE_URL != os.environ.get("DATABASE_URL"):
+    DATABASES["secondary"] = dj_database_url.parse(
+        SECONDARY_DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True,
+    )
+    
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {

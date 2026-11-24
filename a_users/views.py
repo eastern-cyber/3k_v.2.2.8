@@ -1,3 +1,5 @@
+# a_users/viewspy
+
 import os
 import random
 import time
@@ -20,6 +22,10 @@ from allauth.account.forms import SignupForm
 from allauth.account.utils import perform_login
 
 from .forms import ProfileForm, EmailForm, BirthdayForm
+
+from django.conf import settings
+from django.db import connections
+from django.http import Http404
 
 User = get_user_model()
 
@@ -569,3 +575,53 @@ def delete_account(request):
         return redirect('index')
     
     return render(request, 'a_users/profile_delete.html')
+
+# ============================================================================
+# DProject Users Views
+# ============================================================================
+
+def _secondary_alias() -> str:
+    """Return the DB alias that holds the members table."""
+    return "secondary" if "secondary" in settings.DATABASES else "default"
+
+
+@login_required
+def user_detail_view(request, username):
+    alias = _secondary_alias()
+    with connections[alias].cursor() as cur:
+        cur.execute(
+            """
+            SELECT user_id, referrer_id, email, name, token_id,
+                   plan_a, created_at, profile_picture,
+                   profile_media_type, wallet_address
+            FROM users
+            WHERE user_id = %s OR wallet_address = %s
+            LIMIT 1
+            """,
+            [username, username],
+        )
+        cols = [c[0] for c in cur.description]
+        row = cur.fetchone()
+
+    if not row:
+        raise Http404("ไม่พบผู้ใช้รายนี้ในระบบสมาชิก")
+
+    member = dict(zip(cols, row))
+
+    # psycopg returns JSONB as dict; guard against string fallback
+    plan_a = member.get("plan_a") or {}
+    if isinstance(plan_a, str):
+        import json
+        try:
+            plan_a = json.loads(plan_a)
+        except json.JSONDecodeError:
+            plan_a = {}
+
+    context = {"member": member, "plan_a": plan_a}
+
+    template = (
+        "a_users/partials/_user_detail_content.html"
+        if request.htmx
+        else "a_users/user_detail.html"
+    )
+    return render(request, template, context)
