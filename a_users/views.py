@@ -24,8 +24,8 @@ from allauth.account.utils import perform_login
 from .forms import ProfileForm, EmailForm, BirthdayForm
 
 from django.conf import settings
-from django.db import connections
 from django.http import Http404
+from django.db import connections, OperationalError, ProgrammingError
 
 User = get_user_model()
 
@@ -588,27 +588,36 @@ def _secondary_alias() -> str:
 @login_required
 def user_detail_view(request, username):
     alias = _secondary_alias()
-    with connections[alias].cursor() as cur:
-        cur.execute(
-            """
-            SELECT user_id, referrer_id, email, name, token_id,
-                   plan_a, created_at, profile_picture,
-                   profile_media_type, wallet_address
-            FROM users
-            WHERE user_id = %s OR wallet_address = %s
-            LIMIT 1
-            """,
-            [username, username],
-        )
-        cols = [c[0] for c in cur.description]
-        row = cur.fetchone()
+    if alias is None:
+        raise Http404("ระบบสมาชิกยังไม่ได้ตั้งค่า (SECONDARY_DATABASE_URL)")
+
+    # ── Fetch the member from neondb.users ──
+    try:
+        with connections[alias].cursor() as cur:
+            cur.execute(
+                """
+                SELECT user_id, referrer_id, email, name, token_id,
+                       plan_a, created_at, profile_picture,
+                       profile_media_type, wallet_address
+                FROM users
+                WHERE LOWER(user_id) = LOWER(%s) OR LOWER(wallet_address) = LOWER(%s)
+                LIMIT 1
+                """,
+                [username, username],
+            )
+            cols = [c[0] for c in cur.description]
+            row = cur.fetchone()
+    except (OperationalError, ProgrammingError) as e:
+        import logging
+        logging.getLogger(__name__).warning("user_detail DB error: %s", e)
+        raise Http404("ไม่พบผู้ใช้รายนี้ในระบบสมาชิก")
 
     if not row:
         raise Http404("ไม่พบผู้ใช้รายนี้ในระบบสมาชิก")
 
     member = dict(zip(cols, row))
 
-    # psycopg returns JSONB as dict; guard against string fallback
+    # ── plan_a (JSONB → dict) ──
     plan_a = member.get("plan_a") or {}
     if isinstance(plan_a, str):
         import json
@@ -617,7 +626,38 @@ def user_detail_view(request, username):
         except json.JSONDecodeError:
             plan_a = {}
 
-    context = {"member": member, "plan_a": plan_a}
+    # ── Direct PR: members whose referrer_id == this member's user_id ──
+    direct_referrals = []
+    try:
+        with connections[alias].cursor() as cur:
+            cur.execute(
+                """
+                SELECT user_id, name, email, created_at
+                FROM users
+                WHERE LOWER(referrer_id) = LOWER(%s)
+                ORDER BY created_at DESC
+                """,
+                [member.get("user_id")],
+            )
+            ref_cols = [c[0] for c in cur.description]
+            direct_referrals = [dict(zip(ref_cols, r)) for r in cur.fetchall()]
+    except (OperationalError, ProgrammingError) as e:
+        import logging
+        logging.getLogger(__name__).warning("direct_referrals DB error: %s", e)
+
+    # ── Django User for avatar (same source as _profile.html) ──
+    profile_user = (
+        User.objects.filter(username__iexact=username).first()
+        or User.objects.filter(username__iexact=member.get("user_id") or "").first()
+    )
+
+    context = {
+        "member": member,
+        "plan_a": plan_a,
+        "profile_user": profile_user,
+        "direct_referrals": direct_referrals,
+        "direct_referrals_count": len(direct_referrals),
+    }
 
     template = (
         "a_users/partials/_user_detail_content.html"

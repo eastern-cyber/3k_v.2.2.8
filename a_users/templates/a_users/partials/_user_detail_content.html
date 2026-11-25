@@ -29,7 +29,7 @@
     <!-- Detail grid -->
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <dt class="font-medium text-neutral-500">Referrer ID (PR By)</dt>
+            <dt class="font-medium text-neutral-500">Referrer ID (PR by)</dt>
             <dd class="font-mono break-all">
                 {% if member.referrer_id %}
                     <a href="{% url 'a_users:user_detail' username=member.referrer_id %}"
@@ -57,6 +57,10 @@
             <dt class="font-medium text-neutral-500">เข้าร่วม Plan A</dt>
             <dd>{{ member.created_at|date:"d M Y H:i"|default:"—" }}</dd>
         </div>
+        <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 sm:col-span-2">
+            <dt class="font-medium text-neutral-500">Direct PR</dt>
+            <dd class="font-bold">{{ direct_referrals_count }} คน</dd>
+        </div>
     </dl>
 
     <!-- plan_a JSONB -->
@@ -75,6 +79,52 @@
             </table>
         {% else %}
             <p class="text-neutral-500">ไม่มีข้อมูลแผน</p>
+        {% endif %}
+    </div>
+
+    <!-- Direct PR (referrals) -->
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="font-bold text-lg">รายละเอียดสมาชิก Direct PR</h2>
+            <span class="text-sm text-neutral-500">
+                {{ direct_referrals_count }} คน
+            </span>
+        </div>
+
+        {% if direct_referrals %}
+            <div class="overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-700">
+                <table class="w-full text-sm">
+                    <thead class="bg-neutral-100 dark:bg-neutral-800">
+                        <tr>
+                            <th class="text-left px-3 py-2 font-medium text-neutral-500">ชื่อ</th>
+                            <th class="text-left px-3 py-2 font-medium text-neutral-500">User ID</th>
+                            <th class="text-left px-3 py-2 font-medium text-neutral-500">เข้าร่วม</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ref in direct_referrals %}
+                            <tr class="border-t border-neutral-200 dark:border-neutral-800">
+                                <td class="px-3 py-2">{{ ref.name|default:"—" }}</td>
+                                <td class="px-3 py-2 font-mono break-all">
+                                    <a href="{% url 'a_users:user_detail' username=ref.user_id %}"
+                                    hx-get="{% url 'a_users:user_detail' username=ref.user_id %}"
+                                    hx-target="#main-content"
+                                    hx-swap="innerHTML transition:true"
+                                    hx-push-url="true"
+                                    class="hover:underline">
+                                        {{ ref.user_id }}
+                                    </a>
+                                </td>
+                                <td class="px-3 py-2 text-neutral-500">
+                                    {{ ref.created_at|date:"d M Y"|default:"—" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-neutral-500 text-sm">ยังไม่มีสมาชิกที่แนะนำโดยตรง</p>
         {% endif %}
     </div>
 
