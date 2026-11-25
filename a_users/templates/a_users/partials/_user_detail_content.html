@@ -94,37 +94,49 @@
         {% if direct_referrals %}
             <div class="overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-700">
                 <table class="w-full text-sm">
-                    <thead class="bg-neutral-100 dark:bg-neutral-800">
-                        <tr>
-                            <th class="text-left px-3 py-2 font-medium text-neutral-500">ชื่อ</th>
-                            <th class="text-left px-3 py-2 font-medium text-neutral-500">User ID</th>
-                            <th class="text-right px-3 py-2 font-medium text-neutral-500">POL</th>
-                            <th class="text-right px-3 py-2 font-medium text-neutral-500">PR Bonus (40%)</th>
-                            <th class="text-left px-3 py-2 font-medium text-neutral-500">เข้าร่วม</th>
-                        </tr>
-                    </thead>
                     <tbody>
                         {% for ref in direct_referrals %}
-                            <tr class="border-t border-neutral-200 dark:border-neutral-800">
-                                <td class="px-3 py-2">{{ ref.name|default:"—" }}</td>
-                                <td class="px-3 py-2 font-mono break-all">
-                                    <a href="{% url 'a_users:user_detail' username=ref.user_id %}"
-                                    hx-get="{% url 'a_users:user_detail' username=ref.user_id %}"
-                                    hx-target="#main-content"
-                                    hx-swap="innerHTML transition:true"
-                                    hx-push-url="true"
-                                    class="hover:underline">
-                                        {{ ref.user_id }}
-                                    </a>
+                            <!-- Row 1: ชื่อ + User ID -->
+                            <tr class="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30">
+                                <td colspan="3" class="px-3 pt-3 pb-1">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                        <span class="font-medium text-neutral-800 dark:text-neutral-100">
+                                            {{ ref.name|default:"—" }}
+                                        </span>
+                                        <span class="font-mono text-xs text-neutral-500 break-all">
+                                            <a href="{% url 'a_users:user_detail' username=ref.user_id %}"
+                                            hx-get="{% url 'a_users:user_detail' username=ref.user_id %}"
+                                            hx-target="#main-content"
+                                            hx-swap="innerHTML transition:true"
+                                            hx-push-url="true"
+                                            class="hover:underline">
+                                                {{ ref.user_id }}
+                                            </a>
+                                        </span>
+                                    </div>
                                 </td>
-                                <td class="px-3 py-2 text-right tabular-nums">
-                                    {{ ref.pol|floatformat:2 }}
+                            </tr>
+
+                            <!-- Row 2: POL / PR Bonus / Joined -->
+                            <tr class="border-t-0 border-neutral-100 dark:border-neutral-800/50">
+                                <td class="px-3 py-1 text-xs text-neutral-500">
+                                    POL:
+                                    <span class="font-mono tabular-nums text-neutral-700 dark:text-neutral-300">
+                                        {{ ref.pol|floatformat:2 }}
+                                    </span>
                                     {% if ref.purchase_count > 1 %}
-                                        <span class="text-xs text-neutral-500">({{ ref.purchase_count }} ครั้ง)</span>
+                                        <span class="text-neutral-400">({{ ref.purchase_count }} ครั้ง)</span>
                                     {% endif %}
                                 </td>
-                                <td class="px-3 py-2 text-right tabular-nums">{{ ref.pr_bonus|floatformat:2 }}</td>
-                                <td class="px-3 py-2 text-neutral-500">{{ ref.created_at|date:"d M Y"|default:"—" }}</td>
+                                <td class="px-3 py-1 text-xs text-neutral-500">
+                                    PR Bonus:
+                                    <span class="font-mono tabular-nums font-medium text-emerald-600 dark:text-emerald-400">
+                                        {{ ref.pr_bonus|floatformat:2 }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-1 pb-3 text-xs text-neutral-500 text-right">
+                                    {{ ref.created_at|date:"d M Y"|default:"—" }}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
