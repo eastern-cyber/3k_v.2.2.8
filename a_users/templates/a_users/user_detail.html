@@ -1,5 +1,7 @@
-{% extends "base.html" %}
+{% extends "layouts/main-layout.html" %}
 {% load static %}
+
+{% block title %}{{ member.name|default:member.user_id }} - {% endblock %}
 
 {% block content %}
 <div class="ml-18 lg:ml-60 px-4 xl:px-12">
