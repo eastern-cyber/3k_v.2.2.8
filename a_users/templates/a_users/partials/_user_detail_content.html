@@ -29,7 +29,7 @@
     <!-- Detail grid -->
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <dt class="font-medium text-neutral-500">Referrer ID</dt>
+            <dt class="font-medium text-neutral-500">Referrer ID (PR By)</dt>
             <dd class="font-mono break-all">
                 {% if member.referrer_id %}
                     <a href="{% url 'a_users:user_detail' username=member.referrer_id %}"
@@ -54,7 +54,7 @@
             <dd class="font-mono break-all">{{ member.wallet_address|default:"—" }}</dd>
         </div>
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <dt class="font-medium text-neutral-500">Joined</dt>
+            <dt class="font-medium text-neutral-500">เข้าร่วม Plan A</dt>
             <dd>{{ member.created_at|date:"d M Y H:i"|default:"—" }}</dd>
         </div>
     </dl>
