@@ -580,6 +580,53 @@ def delete_account(request):
 # DProject Users Views
 # ============================================================================
 
+def _extract_pol_values(plan_a):
+    """
+    Return a list of float POL values from any plan_a shape observed in the DB:
+      - dict                      → single purchase (new pattern)
+      - list[dict]                → multiple purchases (legacy pattern)
+      - str (JSON stored as text) → parsed, then handled as above
+      - None / '' / {} / []       → []
+      - malformed JSON            → []
+    Non-numeric POL values are coerced to 0.0 rather than raising.
+    """
+    import json
+
+    # Unwrap JSON-as-string (TEXT-typed rows, empty strings)
+    if isinstance(plan_a, str):
+        try:
+            plan_a = json.loads(plan_a)
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    if not plan_a:
+        return []
+
+    # Normalize to a list of records
+    if isinstance(plan_a, dict):
+        records = [plan_a]
+    elif isinstance(plan_a, list):
+        records = plan_a
+    else:
+        return []
+
+    values = []
+    for rec in records:
+        if not isinstance(rec, dict):
+            continue
+        raw = (
+            rec.get("POL")
+            or rec.get("pol")
+            or rec.get("Pol")
+            or rec.get("pol_value")
+            or 0
+        )
+        try:
+            values.append(float(raw or 0))
+        except (TypeError, ValueError):
+            values.append(0.0)
+    return values
+
 def _secondary_alias() -> str:
     """Return the DB alias that holds the members table."""
     return "secondary" if "secondary" in settings.DATABASES else "default"
@@ -617,7 +664,7 @@ def user_detail_view(request, username):
 
     member = dict(zip(cols, row))
 
-    # ── plan_a (JSONB → dict) ──
+    # ── Member's own plan_a (JSONB → dict) ──
     plan_a = member.get("plan_a") or {}
     if isinstance(plan_a, str):
         import json
@@ -625,14 +672,21 @@ def user_detail_view(request, username):
             plan_a = json.loads(plan_a)
         except json.JSONDecodeError:
             plan_a = {}
+    # Normalize to dict if it's a legacy array (take the last record)
+    if isinstance(plan_a, list):
+        plan_a = plan_a[-1] if plan_a and isinstance(plan_a[-1], dict) else {}
 
-    # ── Direct PR: members whose referrer_id == this member's user_id ──
+    # ── Direct PR + PR Bonus ──
     direct_referrals = []
+    total_pol = 0.0
+    total_pr_bonus = 0.0
+    PR_BONUS_RATE = 0.40
+
     try:
         with connections[alias].cursor() as cur:
             cur.execute(
                 """
-                SELECT user_id, name, email, created_at
+                SELECT user_id, name, email, created_at, plan_a
                 FROM users
                 WHERE LOWER(referrer_id) = LOWER(%s)
                 ORDER BY created_at DESC
@@ -640,7 +694,21 @@ def user_detail_view(request, username):
                 [member.get("user_id")],
             )
             ref_cols = [c[0] for c in cur.description]
-            direct_referrals = [dict(zip(ref_cols, r)) for r in cur.fetchall()]
+            for r in cur.fetchall():
+                row_dict = dict(zip(ref_cols, r))
+
+                pol_values = _extract_pol_values(row_dict.get("plan_a"))
+                pol_sum = sum(pol_values)
+                bonus = pol_sum * PR_BONUS_RATE
+
+                row_dict["pol_values"] = pol_values
+                row_dict["pol"] = pol_sum
+                row_dict["purchase_count"] = len(pol_values)
+                row_dict["pr_bonus"] = bonus
+
+                total_pol += pol_sum
+                total_pr_bonus += bonus
+                direct_referrals.append(row_dict)
     except (OperationalError, ProgrammingError) as e:
         import logging
         logging.getLogger(__name__).warning("direct_referrals DB error: %s", e)
@@ -657,6 +725,8 @@ def user_detail_view(request, username):
         "profile_user": profile_user,
         "direct_referrals": direct_referrals,
         "direct_referrals_count": len(direct_referrals),
+        "total_pol": total_pol,
+        "total_pr_bonus": total_pr_bonus,
     }
 
     template = (
