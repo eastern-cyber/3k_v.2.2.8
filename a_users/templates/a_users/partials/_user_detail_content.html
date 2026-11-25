@@ -30,7 +30,20 @@
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
             <dt class="font-medium text-neutral-500">Referrer ID</dt>
-            <dd class="font-mono break-all">{{ member.referrer_id|default:"—" }}</dd>
+            <dd class="font-mono break-all">
+                {% if member.referrer_id %}
+                    <a href="{% url 'a_users:user_detail' username=member.referrer_id %}"
+                    hx-get="{% url 'a_users:user_detail' username=member.referrer_id %}"
+                    hx-target="#main-content"
+                    hx-swap="innerHTML transition:true"
+                    hx-push-url="true"
+                    class="hover:underline">
+                        {{ member.referrer_id }}
+                    </a>
+                {% else %}
+                    <span class="text-neutral-500">ไม่ระบุ</span>
+                {% endif %}
+            </dd>
         </div>
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
             <dt class="font-medium text-neutral-500">Token ID</dt>
